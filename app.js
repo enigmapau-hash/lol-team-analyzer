@@ -1,6 +1,5 @@
-const STORAGE_KEY = "lol-team-analyzer-settings";
-const DEFAULT_MODEL = "gpt-4o-2024-08-06";
 const CHAMPION_LIST_ID = "championList";
+const DRAFT_DATA_URL = "draft-pool.json";
 
 const DEMO = {
   top: "Ornn",
@@ -19,31 +18,7 @@ const FALLBACK_CHAMPIONS = [
   "Wukong", "Xayah", "Yasuo", "Zed", "Zeri", "Ziggs", "Zyra",
 ];
 
-const ANALYSIS_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    identity: { type: "string" },
-    summary: { type: "string" },
-    strengths: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 3 },
-    weaknesses: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 3 },
-    missing_roles: { type: "array", items: { type: "string" }, maxItems: 5 },
-    recommended_picks: { type: "array", items: { type: "string" }, maxItems: 3 },
-    win_condition: { type: "string" },
-  },
-  required: [
-    "identity",
-    "summary",
-    "strengths",
-    "weaknesses",
-    "missing_roles",
-    "recommended_picks",
-    "win_condition",
-  ],
-};
-
 const els = {
-  apiKey: document.getElementById("apiKey"),
   top: document.getElementById("top"),
   jungle: document.getElementById("jungle"),
   mid: document.getElementById("mid"),
@@ -56,46 +31,7 @@ const els = {
   championList: document.getElementById(CHAMPION_LIST_ID),
 };
 
-const SYSTEM_PROMPT = `Eres un analista experto de League of Legends.
-Responde siempre en español, breve y directo.
-
-Analiza la composición actual, aunque esté incompleta.
-Si faltan roles, explica qué falta y recomienda picks útiles para completar el draft.
-Si la composición está completa, céntrate en la lectura final del equipo.
-
-Devuelve solo JSON válido y exactamente con esta estructura:
-{
-  "identity": "string",
-  "summary": "string",
-  "strengths": ["string", "string", "string"],
-  "weaknesses": ["string", "string", "string"],
-  "missing_roles": ["string"],
-  "recommended_picks": ["string"],
-  "win_condition": "string"
-}
-
-Reglas:
-- Máximo 3 puntos por lista.
-- Frases cortas.
-- identity debe ser una etiqueta breve, por ejemplo Front to Back, Dive, Pick, Poke, Protect Carry, Split Push, Wombo Combo o Skirmish.
-- missing_roles: vacío si no falta nadie.
-- recommended_picks: hasta 3 campeones útiles, o vacío si no aplica.
-- Sin markdown.
-- Sin explicaciones.
-- Sin campos extra.`;
-
-function loadSettings() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    if (data.apiKey) els.apiKey.value = data.apiKey;
-  } catch {
-    // ignore
-  }
-}
-
-function saveSettings() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ apiKey: els.apiKey.value.trim() }));
-}
+let draftData = null;
 
 function setStatus(text) {
   els.statusPill.textContent = text;
@@ -117,14 +53,13 @@ function readComposition() {
   };
 }
 
-function roleLabel(key) {
-  return {
-    top: "Top",
-    jungle: "Jungle",
-    mid: "Mid",
-    adc: "ADC",
-    support: "Support",
-  }[key] || key;
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 function renderEmpty(message) {
@@ -138,11 +73,22 @@ function renderList(items) {
     : `<div class="empty-small">-</div>`;
 }
 
+function roleLabel(key) {
+  return {
+    top: "Top",
+    jungle: "Jungle",
+    mid: "Mid",
+    adc: "ADC",
+    support: "Support",
+  }[key] || key;
+}
+
 function renderAnalysis(data) {
   els.result.className = "result-box";
   els.result.innerHTML = `
     <div class="badge-row">
       <span class="badge">${escapeHtml(data.identity || "Sin identidad")}</span>
+      ${typeof data.score === "number" ? `<span class="badge warn">${escapeHtml(data.score)}%</span>` : ""}
     </div>
 
     <div class="result-grid">
@@ -173,47 +119,11 @@ function renderAnalysis(data) {
         ${renderList((data.missing_roles || []).map(roleLabel))}
       </div>
       <div class="metric">
-        <span class="label">Picks recomendados</span>
-        ${renderList(data.recommended_picks)}
+        <span class="label">Notas</span>
+        ${renderList(data.notes)}
       </div>
     </div>
   `;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function buildUserPrompt(comp) {
-  return [
-    "Analiza esta composición de League of Legends:",
-    "",
-    `Top: ${comp.top || "(vacío)"}`,
-    `Jungle: ${comp.jungle || "(vacío)"}`,
-    `Mid: ${comp.mid || "(vacío)"}`,
-    `ADC: ${comp.adc || "(vacío)"}`,
-    `Support: ${comp.support || "(vacío)"}`,
-    "",
-    "Si faltan roles, analiza el draft parcial y recomiéndalos.",
-    "Quiero una lectura sencilla, clara y muy breve.",
-  ].join("\n");
-}
-
-function normalizeAnalysis(raw) {
-  return {
-    identity: String(raw?.identity || "Sin identidad"),
-    summary: String(raw?.summary || ""),
-    strengths: Array.isArray(raw?.strengths) ? raw.strengths.slice(0, 3).map(String) : [],
-    weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
-    missing_roles: Array.isArray(raw?.missing_roles) ? raw.missing_roles.slice(0, 5).map(String) : [],
-    recommended_picks: Array.isArray(raw?.recommended_picks) ? raw.recommended_picks.slice(0, 3).map(String) : [],
-    win_condition: String(raw?.win_condition || ""),
-  };
 }
 
 function renderChampionOptions(names) {
@@ -254,16 +164,70 @@ function findDuplicateChampion(comp) {
   return null;
 }
 
+function normalizeText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function compositionKey(comp) {
+  return [comp.top, comp.jungle, comp.mid, comp.adc, comp.support].map(normalizeText).join("|");
+}
+
+function fallbackAnalysis(comp) {
+  return {
+    identity: "Motor local",
+    score: null,
+    summary: "La app ya no usa IA. Falta cargar la base del Excel exportada a JSON para replicar las fórmulas de Composiciones.",
+    strengths: ["Entrada sin duplicados", "Estructura preparada para datos del Excel"],
+    weaknesses: ["No hay motor de fórmulas cargado", "El Excel aún no está convertido a JSON"],
+    missing_roles: Object.entries(comp).filter(([, champ]) => !champ).map(([role]) => role),
+    notes: ["Añade draft-pool.json con las tablas y fórmulas exportadas.", "Después se puede calcular igual que en la hoja Composiciones."],
+    win_condition: "Cargar la base de datos del draft",
+  };
+}
+
+function analyzeLocal(comp) {
+  if (!draftData || !Array.isArray(draftData.compositions)) {
+    return fallbackAnalysis(comp);
+  }
+
+  const key = compositionKey(comp);
+  const match = draftData.compositions.find((row) => normalizeText(row.key) === key);
+
+  if (match) {
+    return {
+      identity: match.identity || "Sin identidad",
+      score: typeof match.score === "number" ? match.score : null,
+      summary: match.summary || "",
+      strengths: Array.isArray(match.strengths) ? match.strengths : [],
+      weaknesses: Array.isArray(match.weaknesses) ? match.weaknesses : [],
+      missing_roles: Array.isArray(match.missing_roles) ? match.missing_roles : [],
+      notes: Array.isArray(match.notes) ? match.notes : [],
+      win_condition: match.win_condition || "",
+    };
+  }
+
+  return {
+    ...fallbackAnalysis(comp),
+    summary: "No se ha encontrado una composición exacta en la base local.",
+  };
+}
+
+async function loadDraftData() {
+  try {
+    const response = await fetch(DRAFT_DATA_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    draftData = await response.json();
+    setStatus("Base cargada");
+  } catch {
+    draftData = null;
+    setStatus("Sin base");
+    renderEmpty("No se ha cargado la base del Excel todavía.");
+  }
+}
+
 async function analyze() {
-  const apiKey = els.apiKey.value.trim();
   const comp = readComposition();
   const hasAnyChampion = Object.values(comp).some(Boolean);
-
-  if (!apiKey) {
-    renderEmpty("Falta la API key. Escríbela arriba para poder analizar.");
-    setStatus("Sin API key");
-    return;
-  }
 
   if (!hasAnyChampion) {
     renderEmpty("Escribe al menos un campeón para analizar el draft.");
@@ -278,59 +242,11 @@ async function analyze() {
     return;
   }
 
-  saveSettings();
   setBusy(true);
   renderEmpty("Analizando...");
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: DEFAULT_MODEL,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: buildUserPrompt(comp) },
-        ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "team_analysis",
-            strict: true,
-            schema: ANALYSIS_SCHEMA,
-          },
-        },
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const message = data?.error?.message || `Error HTTP ${response.status}`;
-      throw new Error(message);
-    }
-
-    const rawText = data?.choices?.[0]?.message?.content || "";
-    let parsed;
-
-    try {
-      parsed = JSON.parse(rawText);
-    } catch {
-      parsed = {
-        identity: "Respuesta no estructurada",
-        summary: rawText || "No se pudo leer la respuesta.",
-        strengths: [],
-        weaknesses: [],
-        missing_roles: [],
-        recommended_picks: [],
-        win_condition: "",
-      };
-    }
-
-    renderAnalysis(normalizeAnalysis(parsed));
+    renderAnalysis(analyzeLocal(comp));
     setStatus("Listo");
   } catch (error) {
     renderEmpty(`No se pudo analizar: ${escapeHtml(error.message || "error desconocido")}`);
@@ -360,9 +276,8 @@ async function registerServiceWorker() {
 
 els.analyzeBtn.addEventListener("click", analyze);
 els.demoBtn.addEventListener("click", fillDemo);
-els.apiKey.addEventListener("change", saveSettings);
 
-loadSettings();
 loadChampionOptions();
+loadDraftData();
 registerServiceWorker();
 renderEmpty("Aquí aparecerá el análisis.");
