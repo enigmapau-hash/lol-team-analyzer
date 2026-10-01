@@ -1,22 +1,28 @@
-const CHAMPION_LIST_ID = "championList";
-const DRAFT_DATA_URL = "draft-pool.json";
+const WORKBOOK_URL = encodeURI("Draft Pool.xlsx");
 
-const DEMO = {
-  top: "Ornn",
-  jungle: "Vi",
-  mid: "Ahri",
-  adc: "Jinx",
-  support: "Lulu",
+const SHEET_MAP = {
+  top: "Tabla Top",
+  jungle: "Tabla Jungla",
+  mid: "Tabla Mid",
+  botline: "Tabla Botline",
+  support: "Tabla Support",
 };
 
-const FALLBACK_CHAMPIONS = [
-  "Aatrox", "Ahri", "Akali", "Alistar", "Amumu", "Annie", "Ashe", "Aurelion Sol",
-  "Braum", "Caitlyn", "Camille", "Darius", "Diana", "Dr. Mundo", "Ekko", "Ezreal",
-  "Fiora", "Garen", "Gragas", "Janna", "Jax", "Jinx", "Karma", "Kayn", "Leona",
-  "Lulu", "Lux", "Malphite", "Morgana", "Nami", "Nautilus", "Nocturne", "Orianna",
-  "Ornn", "Rakan", "Sejuani", "Sett", "Sivir", "Thresh", "Tristana", "Vi", "Viego",
-  "Wukong", "Xayah", "Yasuo", "Zed", "Zeri", "Ziggs", "Zyra",
+const ROLE_ORDER = [
+  { key: "top", label: "TOP" },
+  { key: "jungle", label: "JUNGLA" },
+  { key: "mid", label: "MID" },
+  { key: "botline", label: "BOTLINE" },
+  { key: "support", label: "SUPPORT" },
 ];
+
+const DEMO = {
+  top: "Aatrox",
+  jungle: "Briar",
+  mid: "Anivia",
+  adc: "Draven",
+  support: "Janna",
+};
 
 const els = {
   top: document.getElementById("top"),
@@ -28,7 +34,7 @@ const els = {
   demoBtn: document.getElementById("demoBtn"),
   result: document.getElementById("result"),
   statusPill: document.getElementById("statusPill"),
-  championList: document.getElementById(CHAMPION_LIST_ID),
+  championList: document.getElementById("championList"),
 };
 
 let draftData = null;
@@ -40,7 +46,16 @@ function setStatus(text) {
 function setBusy(isBusy) {
   els.analyzeBtn.disabled = isBusy;
   els.demoBtn.disabled = isBusy;
-  setStatus(isBusy ? "Analizando..." : "Listo");
+  setStatus(isBusy ? "Cargando..." : "Listo");
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/["'`´’]/g, "")
+    .trim()
+    .toLowerCase();
 }
 
 function readComposition() {
@@ -67,170 +82,97 @@ function renderEmpty(message) {
   els.result.innerHTML = message;
 }
 
-function renderList(items) {
-  return Array.isArray(items) && items.length
-    ? `<ul class="list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
-    : `<div class="empty-small">-</div>`;
-}
-
-function roleLabel(key) {
-  return {
-    top: "Top",
-    jungle: "Jungle",
-    mid: "Mid",
-    adc: "ADC",
-    support: "Support",
-  }[key] || key;
-}
-
-function renderAnalysis(data) {
-  els.result.className = "result-box";
-  els.result.innerHTML = `
-    <div class="badge-row">
-      <span class="badge">${escapeHtml(data.identity || "Sin identidad")}</span>
-      ${typeof data.score === "number" ? `<span class="badge warn">${escapeHtml(data.score)}%</span>` : ""}
-    </div>
-
-    <div class="result-grid">
-      <div class="metric">
-        <span class="label">Resumen</span>
-        <div class="value">${escapeHtml(data.summary || "-")}</div>
-      </div>
-      <div class="metric">
-        <span class="label">Condición de victoria</span>
-        <div class="value">${escapeHtml(data.win_condition || "-")}</div>
-      </div>
-    </div>
-
-    <div class="result-grid">
-      <div class="metric">
-        <span class="label">Fortalezas</span>
-        ${renderList(data.strengths)}
-      </div>
-      <div class="metric">
-        <span class="label">Debilidades</span>
-        ${renderList(data.weaknesses)}
-      </div>
-    </div>
-
-    <div class="result-grid">
-      <div class="metric">
-        <span class="label">Roles que faltan</span>
-        ${renderList((data.missing_roles || []).map(roleLabel))}
-      </div>
-      <div class="metric">
-        <span class="label">Notas</span>
-        ${renderList(data.notes)}
-      </div>
-    </div>
-  `;
-}
-
-function renderChampionOptions(names) {
-  if (!els.championList) return;
-  els.championList.innerHTML = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
-}
-
-async function loadChampionOptions() {
-  try {
-    const versionsResponse = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
-    const versions = await versionsResponse.json();
-    const version = Array.isArray(versions) && versions.length ? versions[0] : null;
-    if (!version) throw new Error("No Data Dragon version");
-
-    const championsResponse = await fetch(
-      `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`
-    );
-    const champions = await championsResponse.json();
-    const names = Object.values(champions?.data || {})
-      .map((champion) => champion.name)
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b));
-
-    renderChampionOptions(names.length ? names : FALLBACK_CHAMPIONS);
-  } catch {
-    renderChampionOptions(FALLBACK_CHAMPIONS);
-  }
-}
-
 function findDuplicateChampion(comp) {
   const seen = new Set();
   for (const champion of Object.values(comp)) {
     if (!champion) continue;
-    const key = champion.toLowerCase();
+    const key = normalizeText(champion);
     if (seen.has(key)) return champion;
     seen.add(key);
   }
   return null;
 }
 
-function normalizeText(value) {
-  return String(value || "").trim().toLowerCase();
+function roleInputKey(roleKey) {
+  return roleKey === "botline" ? "adc" : roleKey;
 }
 
-function compositionKey(comp) {
-  return [comp.top, comp.jungle, comp.mid, comp.adc, comp.support].map(normalizeText).join("|");
-}
+function buildChampionList() {
+  const champions = new Set();
 
-function fallbackAnalysis(comp) {
-  return {
-    identity: "Motor local",
-    score: null,
-    summary: "La app ya no usa IA. Falta cargar la base del Excel exportada a JSON para replicar las fórmulas de Composiciones.",
-    strengths: ["Entrada sin duplicados", "Estructura preparada para datos del Excel"],
-    weaknesses: ["No hay motor de fórmulas cargado", "El Excel aún no está convertido a JSON"],
-    missing_roles: Object.entries(comp).filter(([, champ]) => !champ).map(([role]) => role),
-    notes: ["Añade draft-pool.json con las tablas y fórmulas exportadas.", "Después se puede calcular igual que en la hoja Composiciones."],
-    win_condition: "Cargar la base de datos del draft",
-  };
-}
-
-function analyzeLocal(comp) {
-  if (!draftData || !Array.isArray(draftData.compositions)) {
-    return fallbackAnalysis(comp);
+  for (const sheetRows of Object.values(draftData?.roles || {})) {
+    for (const row of sheetRows || []) {
+      if (row?.champion) champions.add(row.champion);
+    }
   }
 
-  const key = compositionKey(comp);
-  const match = draftData.compositions.find((row) => normalizeText(row.key) === key);
-
-  if (match) {
-    return {
-      identity: match.identity || "Sin identidad",
-      score: typeof match.score === "number" ? match.score : null,
-      summary: match.summary || "",
-      strengths: Array.isArray(match.strengths) ? match.strengths : [],
-      weaknesses: Array.isArray(match.weaknesses) ? match.weaknesses : [],
-      missing_roles: Array.isArray(match.missing_roles) ? match.missing_roles : [],
-      notes: Array.isArray(match.notes) ? match.notes : [],
-      win_condition: match.win_condition || "",
-    };
-  }
-
-  return {
-    ...fallbackAnalysis(comp),
-    summary: "No se ha encontrado una composición exacta en la base local.",
-  };
+  return [...champions].sort((a, b) => a.localeCompare(b, "es"));
 }
 
-async function loadDraftData() {
-  try {
-    const response = await fetch(DRAFT_DATA_URL, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    draftData = await response.json();
-    setStatus("Base cargada");
-  } catch {
-    draftData = null;
-    setStatus("Sin base");
-    renderEmpty("No se ha cargado la base del Excel todavía.");
-  }
+function renderChampionOptions() {
+  if (!els.championList) return;
+  const names = buildChampionList();
+  els.championList.innerHTML = names
+    .map((name) => `<option value="${escapeHtml(name)}"></option>`)
+    .join("");
 }
 
-async function analyze() {
+function findRoleRow(roleKey, championName) {
+  const roleRows = draftData?.roles?.[roleKey];
+  if (!Array.isArray(roleRows) || !championName) return null;
+
+  const target = normalizeText(championName);
+  return roleRows.find((row) => normalizeText(row?.champion) === target) || null;
+}
+
+function renderComposition(comp) {
+  const rows = ROLE_ORDER.map((role) => {
+    const champ = comp[roleInputKey(role.key)];
+    const data = findRoleRow(role.key, champ);
+    const missing = champ && !data;
+
+    return `
+      <tr class="${missing ? "is-missing" : ""}">
+        <td class="role-cell">${escapeHtml(role.label)}</td>
+        <td>${escapeHtml(champ || "—")}</td>
+        <td>${escapeHtml(data?.identity || (champ ? "No encontrado" : ""))}</td>
+        <td>${escapeHtml(data?.function || "")}</td>
+        <td>${escapeHtml(data?.tempo || "")}</td>
+        <td>${escapeHtml(data?.strengths || "")}</td>
+        <td>${escapeHtml(data?.weaknesses || "")}</td>
+      </tr>
+    `;
+  }).join("");
+
+  els.result.className = "result-box";
+  els.result.innerHTML = `
+    <div class="table-wrap">
+      <table class="composition-table">
+        <thead>
+          <tr>
+            <th>Rol</th>
+            <th>Campeón</th>
+            <th>Identidad</th>
+            <th>Función</th>
+            <th>Ritmo</th>
+            <th>Fortalezas</th>
+            <th>Debilidades</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function analyze() {
   const comp = readComposition();
   const hasAnyChampion = Object.values(comp).some(Boolean);
 
   if (!hasAnyChampion) {
-    renderEmpty("Escribe al menos un campeón para analizar el draft.");
+    renderEmpty("Escribe al menos un campeón para mostrar la tabla.");
     setStatus("Faltan campeones");
     return;
   }
@@ -243,13 +185,11 @@ async function analyze() {
   }
 
   setBusy(true);
-  renderEmpty("Analizando...");
-
   try {
-    renderAnalysis(analyzeLocal(comp));
+    renderComposition(comp);
     setStatus("Listo");
   } catch (error) {
-    renderEmpty(`No se pudo analizar: ${escapeHtml(error.message || "error desconocido")}`);
+    renderEmpty(`No se pudo cargar la composición: ${escapeHtml(error.message || "error desconocido")}`);
     setStatus("Error");
   } finally {
     setBusy(false);
@@ -263,21 +203,54 @@ function fillDemo() {
   els.adc.value = DEMO.adc;
   els.support.value = DEMO.support;
   setStatus("Ejemplo cargado");
+  analyze();
 }
 
-async function registerServiceWorker() {
-  if (!("serviceWorker" in navigator)) return;
+async function loadWorkbook() {
   try {
-    await navigator.serviceWorker.register("sw.js");
-  } catch {
-    // ignore
+    if (typeof XLSX === "undefined") {
+      throw new Error("No se pudo cargar la librería XLSX");
+    }
+
+    const response = await fetch(WORKBOOK_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const buffer = await response.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+
+    const roles = {};
+    for (const [roleKey, sheetName] of Object.entries(SHEET_MAP)) {
+      const sheet = workbook.Sheets[sheetName];
+      if (!sheet) {
+        throw new Error(`Falta la hoja ${sheetName}`);
+      }
+
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      roles[roleKey] = rows
+        .map((row) => ({
+          champion: String(row["Campeón"] || "").trim(),
+          identity: String(row["Identidad"] || "").trim(),
+          function: String(row["Función"] || "").trim(),
+          tempo: String(row["Ritmo"] || "").trim(),
+          strengths: String(row["Fortalezas"] || "").trim(),
+          weaknesses: String(row["Debilidades"] || "").trim(),
+        }))
+        .filter((row) => row.champion);
+    }
+
+    draftData = { roles };
+    renderChampionOptions();
+    setStatus("Base cargada");
+  } catch (error) {
+    draftData = null;
+    renderChampionOptions();
+    setStatus("Sin base");
+    renderEmpty(`No se ha podido leer el Excel: ${escapeHtml(error.message || "error")}`);
   }
 }
 
 els.analyzeBtn.addEventListener("click", analyze);
 els.demoBtn.addEventListener("click", fillDemo);
 
-loadChampionOptions();
-loadDraftData();
-registerServiceWorker();
-renderEmpty("Aquí aparecerá el análisis.");
+renderEmpty("Aquí aparecerá la tabla Composición.");
+loadWorkbook();
