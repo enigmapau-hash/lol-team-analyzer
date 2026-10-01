@@ -1,0 +1,19 @@
+{
+  "version": "v0.4.0-alpha",
+  "track": "Etapa 1 - Infraestructura",
+  "label": "Excel Engine",
+  "updated": "2026-10-01",
+  "summary": [
+    "Champion Picker propio",
+    "Carga del Excel desde GitHub Raw",
+    "Selector por rol",
+    "Responsive base",
+    "Bloqueo de campeones repetidos",
+    "Iconos oficiales"
+  ],
+  "pending": [
+    "Auditoría móvil final",
+    "Auditoría tablet final",
+    "Cierre visual del selector en todos los dispositivos"
+  ]
+}
