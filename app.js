@@ -29,14 +29,6 @@ const INPUT_BY_ROLE = {
   support: "support",
 };
 
-const ROLE_LIST_IDS = {
-  top: "topList",
-  jungle: "jungleList",
-  mid: "midList",
-  botline: "botlineList",
-  support: "supportList",
-};
-
 const DEMO = {
   top: "Aatrox",
   jungle: "Briar",
@@ -55,11 +47,6 @@ const els = {
   demoBtn: document.getElementById("demoBtn"),
   result: document.getElementById("result"),
   statusPill: document.getElementById("statusPill"),
-  topList: document.getElementById("topList"),
-  jungleList: document.getElementById("jungleList"),
-  midList: document.getElementById("midList"),
-  botlineList: document.getElementById("botlineList"),
-  supportList: document.getElementById("supportList"),
 };
 
 let draftData = null;
@@ -126,11 +113,14 @@ function buildChampionList(roleKey) {
 }
 
 function renderChampionOptions() {
-  for (const [roleKey, listId] of Object.entries(ROLE_LIST_IDS)) {
-    const listEl = document.getElementById(listId);
-    if (!listEl) continue;
-    const names = buildChampionList(roleKey);
-    listEl.innerHTML = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+  for (const role of ROLE_ORDER) {
+    const select = els[roleInputKey(role.key)];
+    if (!select) continue;
+
+    const names = buildChampionList(role.key);
+    const placeholder = `<option value="" selected disabled>Selecciona un campeón</option>`;
+    const options = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+    select.innerHTML = placeholder + options;
   }
 }
 
@@ -162,10 +152,14 @@ function firstInvalidRole(comp) {
   for (const role of ROLE_ORDER) {
     const champ = comp[roleInputKey(role.key)];
     if (champ && !findRoleRow(role.key, champ)) {
-      return { role: role.label, champion: champ };
+      return { role: role.key, champion: champ };
     }
   }
   return null;
+}
+
+function inputForRole(roleKey) {
+  return els[roleInputKey(roleKey)] || null;
 }
 
 function setInputValidity(input, isInvalid) {
@@ -176,7 +170,7 @@ function setInputValidity(input, isInvalid) {
 
 function clearInputValidity() {
   for (const input of Object.values(els)) {
-    if (input && input.tagName === "INPUT") {
+    if (input && ["INPUT", "SELECT"].includes(input.tagName)) {
       setInputValidity(input, false);
     }
   }
@@ -255,7 +249,7 @@ function analyze() {
 
   if (!hasAnyChampion) {
     clearInputValidity();
-    renderEmpty("Escribe al menos un campeón para mostrar la tabla.");
+    renderEmpty("Selecciona un campeón en cada rol.");
     setStatus("Faltan campeones");
     return;
   }
@@ -276,8 +270,10 @@ function analyze() {
   clearInputValidity();
   const invalidRole = firstInvalidRole(comp);
   if (invalidRole) {
+    const roleKey = invalidRole.role;
+    setInputValidity(inputForRole(roleKey), true);
     renderComposition(comp);
-    setStatus(`No válido en ${invalidRole.role}: ${invalidRole.champion}`);
+    setStatus(`No válido en ${roleKey.toUpperCase()}: ${invalidRole.champion}`);
     return;
   }
 
@@ -389,9 +385,8 @@ async function loadWorkbook() {
 
 function bindLiveUpdates() {
   for (const input of [els.top, els.jungle, els.mid, els.adc, els.support]) {
-    input.addEventListener("input", scheduleAnalyze);
     input.addEventListener("change", scheduleAnalyze);
-    input.addEventListener("blur", scheduleAnalyze);
+    input.addEventListener("input", scheduleAnalyze);
   }
 }
 
