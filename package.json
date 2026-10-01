@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "audit:excel": "node tools/check-workbook.cjs \"Draft Pool.xlsx\"",
+    "audit:excel:report": "node tools/check-workbook.cjs \"Draft Pool.xlsx\" > workbook-report.json",
     "extract:workbook": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\" draft-pool.json",
     "extract:workbook:stdout": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\"",
     "validate:cases": "node tools/validate-cases.cjs",
