@@ -260,3 +260,9 @@ button.secondary {
   color: var(--text);
   border: 1px solid var(--line);
 }
+
+#pickerBackdrop {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
