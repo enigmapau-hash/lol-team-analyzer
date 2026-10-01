@@ -184,6 +184,8 @@ function portalizeMenus() {
     menu.setAttribute("aria-label", `${role.label} champions`);
     menu.setAttribute("aria-hidden", "true");
     menu.hidden = true;
+    menu.style.visibility = "hidden";
+    menu.style.opacity = "0";
 
     input.setAttribute("role", "combobox");
     input.setAttribute("aria-autocomplete", "list");
@@ -206,6 +208,8 @@ function closeRoleMenu(roleKey) {
   if (menu) {
     menu.hidden = true;
     menu.setAttribute("aria-hidden", "true");
+    menu.style.visibility = "hidden";
+    menu.style.opacity = "0";
   }
   if (input) {
     input.setAttribute("aria-expanded", "false");
@@ -348,6 +352,8 @@ function renderRoleMenu(roleKey, query = "") {
 
   menu.hidden = false;
   menu.setAttribute("aria-hidden", "false");
+  menu.style.visibility = "hidden";
+  menu.style.opacity = "0";
   input.setAttribute("aria-expanded", "true");
   menuState.set(roleKey, { activeIndex: items.length ? 0 : -1 });
   if (items.length) {
@@ -359,7 +365,13 @@ function renderRoleMenu(roleKey, query = "") {
   activeRoleKey = roleKey;
   updateBodyPickerState();
   positionRoleMenu(roleKey);
-  window.requestAnimationFrame(() => positionRoleMenu(roleKey));
+  window.requestAnimationFrame(() => {
+    positionRoleMenu(roleKey);
+    if (!menu.hidden) {
+      menu.style.visibility = "visible";
+      menu.style.opacity = "1";
+    }
+  });
 }
 
 function openRoleMenu(roleKey) {
