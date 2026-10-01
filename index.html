@@ -11,7 +11,133 @@
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="version.css" />
+    <style>
+      .version-badge {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 12000;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 10px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        background: rgba(17, 19, 24, 0.92);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+        color: var(--text);
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+      }
+
+      .version-badge__version {
+        font-size: 0.92rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .version-badge__label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .version-panel {
+        position: fixed;
+        right: 16px;
+        bottom: 68px;
+        z-index: 12000;
+        width: min(320px, calc(100vw - 32px));
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        background: rgba(17, 19, 24, 0.96);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        color: var(--text);
+      }
+
+      .version-panel__title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .version-panel__title h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .version-panel__meta {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .version-panel__section {
+        margin-top: 10px;
+      }
+
+      .version-panel__section h3 {
+        margin: 0 0 6px;
+        font-size: 0.82rem;
+        color: var(--accent-2);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .version-panel__section ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--text);
+      }
+
+      .version-panel__section li {
+        margin: 4px 0;
+        color: var(--muted);
+      }
+
+      .version-panel__close {
+        margin-top: 12px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      .picker-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        background: rgba(5, 8, 12, 0.62);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        display: none;
+        pointer-events: auto;
+      }
+
+      @media (max-width: 720px) {
+        .version-badge {
+          right: 12px;
+          bottom: 12px;
+          padding: 9px 10px;
+        }
+
+        .version-panel {
+          right: 12px;
+          left: 12px;
+          bottom: 66px;
+          width: auto;
+        }
+      }
+    </style>
     <title>LoL Team Analyzer</title>
   </head>
   <body>
@@ -37,15 +163,7 @@
           <label class="picker">
             <span>Top</span>
             <div class="picker-shell">
-              <input
-                id="top"
-                type="text"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Aatrox"
-                aria-autocomplete="list"
-                aria-expanded="false"
-              />
+              <input id="top" type="text" autocomplete="off" spellcheck="false" placeholder="Aatrox" aria-autocomplete="list" aria-expanded="false" />
               <div id="topMenu" class="picker-menu" hidden></div>
             </div>
           </label>
@@ -53,15 +171,7 @@
           <label class="picker">
             <span>Jungla</span>
             <div class="picker-shell">
-              <input
-                id="jungle"
-                type="text"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Briar"
-                aria-autocomplete="list"
-                aria-expanded="false"
-              />
+              <input id="jungle" type="text" autocomplete="off" spellcheck="false" placeholder="Briar" aria-autocomplete="list" aria-expanded="false" />
               <div id="jungleMenu" class="picker-menu" hidden></div>
             </div>
           </label>
@@ -69,15 +179,7 @@
           <label class="picker">
             <span>Mid</span>
             <div class="picker-shell">
-              <input
-                id="mid"
-                type="text"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Anivia"
-                aria-autocomplete="list"
-                aria-expanded="false"
-              />
+              <input id="mid" type="text" autocomplete="off" spellcheck="false" placeholder="Anivia" aria-autocomplete="list" aria-expanded="false" />
               <div id="midMenu" class="picker-menu" hidden></div>
             </div>
           </label>
@@ -85,15 +187,7 @@
           <label class="picker">
             <span>Botline</span>
             <div class="picker-shell">
-              <input
-                id="adc"
-                type="text"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Draven"
-                aria-autocomplete="list"
-                aria-expanded="false"
-              />
+              <input id="adc" type="text" autocomplete="off" spellcheck="false" placeholder="Draven" aria-autocomplete="list" aria-expanded="false" />
               <div id="botlineMenu" class="picker-menu" hidden></div>
             </div>
           </label>
@@ -101,15 +195,7 @@
           <label class="picker">
             <span>Support</span>
             <div class="picker-shell">
-              <input
-                id="support"
-                type="text"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Janna"
-                aria-autocomplete="list"
-                aria-expanded="false"
-              />
+              <input id="support" type="text" autocomplete="off" spellcheck="false" placeholder="Janna" aria-autocomplete="list" aria-expanded="false" />
               <div id="supportMenu" class="picker-menu" hidden></div>
             </div>
           </label>
@@ -131,15 +217,199 @@
     </main>
 
     <button id="versionBadge" class="version-badge" type="button" aria-expanded="false" aria-controls="versionPanel">
-      <span class="version-badge__version">v0.0.0</span>
-      <span class="version-badge__label">Revisión</span>
+      <span class="version-badge__version">v0.4.0-alpha</span>
+      <span class="version-badge__label">Excel Engine</span>
     </button>
 
     <section id="versionPanel" class="version-panel" hidden aria-live="polite"></section>
+    <div id="pickerBackdrop" class="picker-backdrop" hidden aria-hidden="true"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="app.js"></script>
-    <script src="picker-overlay.js"></script>
-    <script src="version.js"></script>
+    <script>
+      (() => {
+        const badge = document.getElementById('versionBadge');
+        const panel = document.getElementById('versionPanel');
+        if (!badge || !panel) return;
+
+        const data = {
+          version: 'v0.4.0-alpha',
+          track: 'Etapa 1 - Infraestructura',
+          label: 'Excel Engine',
+          updated: '2026-10-01',
+          summary: [
+            'Champion Picker propio',
+            'Carga del Excel desde GitHub Raw',
+            'Selector por rol',
+            'Responsive base',
+            'Bloqueo de campeones repetidos',
+            'Iconos oficiales',
+          ],
+          pending: [
+            'Auditoría móvil final',
+            'Auditoría tablet final',
+            'Cierre visual del selector en todos los dispositivos',
+          ],
+        };
+
+        function render(current) {
+          badge.querySelector('.version-badge__version').textContent = current.version;
+          badge.querySelector('.version-badge__label').textContent = current.label;
+          panel.innerHTML = `
+            <div class="version-panel__title">
+              <h2>${current.version}</h2>
+              <p class="version-panel__meta">${current.track}</p>
+            </div>
+            <p class="version-panel__meta">Actualizado: ${current.updated}</p>
+            <div class="version-panel__section">
+              <h3>Hecho</h3>
+              <ul>${current.summary.map((item) => `<li>${item}</li>`).join('')}</ul>
+            </div>
+            <div class="version-panel__section">
+              <h3>Pendiente</h3>
+              <ul>${current.pending.map((item) => `<li>${item}</li>`).join('')}</ul>
+            </div>
+            <button class="version-panel__close" type="button" data-close-version-panel>Cerrar</button>
+          `;
+        }
+
+        function setOpen(isOpen) {
+          badge.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          panel.hidden = !isOpen;
+        }
+
+        badge.addEventListener('click', () => setOpen(panel.hidden));
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLElement)) return;
+          if (target.closest('[data-close-version-panel]')) {
+            setOpen(false);
+            return;
+          }
+          if (panel.hidden) return;
+          if (target === badge || badge.contains(target) || panel.contains(target)) return;
+          setOpen(false);
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && !panel.hidden) setOpen(false);
+        });
+
+        panel.hidden = true;
+        setOpen(false);
+        render(data);
+      })();
+    </script>
+    <script>
+      (() => {
+        const MENU_IDS = ['topMenu', 'jungleMenu', 'midMenu', 'botlineMenu', 'supportMenu'];
+        const MOBILE_QUERY = '(max-width: 720px)';
+        const backdrop = document.getElementById('pickerBackdrop');
+        const observedMenus = [];
+
+        if (!backdrop) return;
+
+        function mobileSheetEnabled() {
+          return window.matchMedia(MOBILE_QUERY).matches;
+        }
+
+        function getMenus() {
+          return MENU_IDS.map((id) => document.getElementById(id)).filter(Boolean);
+        }
+
+        function clearMobileStyles(menu) {
+          menu.classList.remove('is-mobile-sheet');
+          menu.style.removeProperty('bottom');
+          menu.style.removeProperty('left');
+          menu.style.removeProperty('right');
+          menu.style.removeProperty('transform');
+          menu.style.removeProperty('width');
+          menu.style.removeProperty('max-width');
+          menu.style.removeProperty('max-height');
+          menu.style.removeProperty('border-radius');
+        }
+
+        function applyMobileStyles(menu) {
+          const viewportWidth = window.innerWidth;
+          const sheetWidth = Math.min(560, Math.max(240, viewportWidth - 24));
+          menu.classList.add('is-mobile-sheet');
+          menu.style.position = 'fixed';
+          menu.style.left = '50%';
+          menu.style.right = 'auto';
+          menu.style.transform = 'translateX(-50%)';
+          menu.style.bottom = '12px';
+          menu.style.top = 'auto';
+          menu.style.width = `${sheetWidth}px`;
+          menu.style.maxWidth = `${sheetWidth}px`;
+          menu.style.maxHeight = 'min(60vh, 420px)';
+          menu.style.borderRadius = '20px';
+          menu.style.zIndex = '9999';
+        }
+
+        function syncOverlay() {
+          const menus = getMenus();
+          const anyOpen = menus.some((menu) => !menu.hidden);
+          const mobile = mobileSheetEnabled();
+
+          for (const menu of menus) {
+            if (menu.hidden) {
+              clearMobileStyles(menu);
+              continue;
+            }
+            if (mobile) {
+              applyMobileStyles(menu);
+            } else {
+              clearMobileStyles(menu);
+            }
+          }
+
+          backdrop.hidden = !(anyOpen && mobile);
+          backdrop.style.display = anyOpen && mobile ? 'block' : 'none';
+          document.body.classList.toggle('picker-open', anyOpen);
+        }
+
+        let scheduled = false;
+        function scheduleSync() {
+          if (scheduled) return;
+          scheduled = true;
+          window.requestAnimationFrame(() => {
+            scheduled = false;
+            syncOverlay();
+          });
+        }
+
+        function attachObservers() {
+          const menus = getMenus();
+          if (!menus.length) {
+            window.setTimeout(attachObservers, 100);
+            return;
+          }
+
+          for (const menu of menus) {
+            if (observedMenus.includes(menu)) continue;
+            observedMenus.push(menu);
+            const observer = new MutationObserver(scheduleSync);
+            observer.observe(menu, {
+              attributes: true,
+              attributeFilter: ['hidden', 'style', 'class'],
+            });
+          }
+
+          scheduleSync();
+        }
+
+        backdrop.addEventListener('pointerdown', scheduleSync);
+        window.addEventListener('resize', scheduleSync, { passive: true });
+        window.addEventListener('orientationchange', scheduleSync, { passive: true });
+        window.addEventListener('scroll', scheduleSync, { passive: true, capture: true });
+        document.addEventListener('focusin', scheduleSync, { passive: true });
+        document.addEventListener('click', scheduleSync, { passive: true });
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', attachObservers, { once: true });
+        } else {
+          attachObservers();
+        }
+      })();
+    </script>
   </body>
 </html>
