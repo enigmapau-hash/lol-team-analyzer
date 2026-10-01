@@ -20,7 +20,7 @@ Mini PWA para ver la pestaña **Composición** del Excel del repositorio directa
 ## Detalles
 
 - Ya no usa IA.
-- La app lee `Draft Pool.xlsx` en el navegador.
+- La app lee `Draft Pool.xlsx` directamente en el navegador.
 - La salida reproduce las columnas de la hoja **Composición**.
 - Cada rol usa su propia lista de campeones desde su hoja del Excel.
 - No permite campeones repetidos.
@@ -29,11 +29,15 @@ Mini PWA para ver la pestaña **Composición** del Excel del repositorio directa
 
 ## Comandos útiles
 
+- `npm run audit:excel` → valida directamente el Excel sin convertirlo a JSON
+- `npm run version:sync` → sincroniza versión, changelog y metadata visible
+
+## Herramientas opcionales de desarrollo
+
 - `npm run extract:workbook` → extrae el Excel a `draft-pool.json`
 - `npm run generate:cases` → rellena los casos de prueba desde el JSON del workbook
 - `npm run validate:cases` → valida el formato de `tests/cases.json`
-- `npm run audit:stage1:full` → ejecuta extracción, generación y validación
-- `npm run version:sync` → sincroniza versión, changelog y metadata visible
+- `npm run report:cases` → genera un informe legible de los casos
 
 ## Auditoría local
 
@@ -41,11 +45,9 @@ Cuando trabajes con el archivo Excel en tu equipo:
 
 1. Descarga o copia `Draft Pool.xlsx` en la raíz del repo.
 2. Instala dependencias con `npm install`.
-3. Ejecuta `npm run extract:workbook` para generar `draft-pool.json`.
-4. Ejecuta `npm run generate:cases` para rellenar `tests/cases.json` con datos del workbook.
-5. Ejecuta `npm run validate:cases` para comprobar el formato.
-6. Ejecuta `npm run audit:stage1:full` para repetir todo el flujo de auditoría.
-7. Si cambias la versión visible, usa `npm run version:sync`.
+3. Ejecuta `npm run audit:excel` para revisar hojas, columnas y estructura directamente desde el Excel.
+4. Si necesitas utilidades de pruebas, usa los comandos opcionales de desarrollo.
+5. Si cambias la versión visible, usa `npm run version:sync`.
 
 ## Nota
 
