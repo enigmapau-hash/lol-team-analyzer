@@ -24,27 +24,21 @@ const ANALYSIS_SCHEMA = {
   additionalProperties: false,
   properties: {
     identity: { type: "string" },
-    playstyle: { type: "string" },
     summary: { type: "string" },
     strengths: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 3 },
     weaknesses: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 3 },
     missing_roles: { type: "array", items: { type: "string" }, maxItems: 5 },
     recommended_picks: { type: "array", items: { type: "string" }, maxItems: 3 },
     win_condition: { type: "string" },
-    main_threat: { type: "string" },
-    difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
   },
   required: [
     "identity",
-    "playstyle",
     "summary",
     "strengths",
     "weaknesses",
     "missing_roles",
     "recommended_picks",
     "win_condition",
-    "main_threat",
-    "difficulty",
   ],
 };
 
@@ -72,22 +66,18 @@ Si la composición está completa, céntrate en la lectura final del equipo.
 Devuelve solo JSON válido y exactamente con esta estructura:
 {
   "identity": "string",
-  "playstyle": "string",
   "summary": "string",
   "strengths": ["string", "string", "string"],
   "weaknesses": ["string", "string", "string"],
   "missing_roles": ["string"],
   "recommended_picks": ["string"],
-  "win_condition": "string",
-  "main_threat": "string",
-  "difficulty": "Easy|Medium|Hard"
+  "win_condition": "string"
 }
 
 Reglas:
 - Máximo 3 puntos por lista.
 - Frases cortas.
-- summary: una sola frase muy clara, máximo 18 palabras.
-- playstyle: una etiqueta breve.
+- identity debe ser una etiqueta breve, por ejemplo Front to Back, Dive, Pick, Poke, Protect Carry, Split Push, Wombo Combo o Skirmish.
 - missing_roles: vacío si no falta nadie.
 - recommended_picks: hasta 3 campeones útiles, o vacío si no aplica.
 - Sin markdown.
@@ -153,8 +143,6 @@ function renderAnalysis(data) {
   els.result.innerHTML = `
     <div class="badge-row">
       <span class="badge">${escapeHtml(data.identity || "Sin identidad")}</span>
-      <span class="badge warn">${escapeHtml(data.playstyle || "Playstyle")}</span>
-      <span class="badge red">${escapeHtml(data.difficulty || "Medium")}</span>
     </div>
 
     <div class="result-grid">
@@ -165,17 +153,6 @@ function renderAnalysis(data) {
       <div class="metric">
         <span class="label">Condición de victoria</span>
         <div class="value">${escapeHtml(data.win_condition || "-")}</div>
-      </div>
-    </div>
-
-    <div class="result-grid">
-      <div class="metric">
-        <span class="label">Amenaza principal</span>
-        <div class="value">${escapeHtml(data.main_threat || "-")}</div>
-      </div>
-      <div class="metric">
-        <span class="label">Roles que faltan</span>
-        ${renderList((data.missing_roles || []).map(roleLabel))}
       </div>
     </div>
 
@@ -192,12 +169,12 @@ function renderAnalysis(data) {
 
     <div class="result-grid">
       <div class="metric">
-        <span class="label">Picks recomendados</span>
-        ${renderList(data.recommended_picks)}
+        <span class="label">Roles que faltan</span>
+        ${renderList((data.missing_roles || []).map(roleLabel))}
       </div>
       <div class="metric">
-        <span class="label">Lectura rápida</span>
-        <div class="value">${escapeHtml(data.summary || data.playstyle || "-")}</div>
+        <span class="label">Picks recomendados</span>
+        ${renderList(data.recommended_picks)}
       </div>
     </div>
   `;
@@ -230,15 +207,12 @@ function buildUserPrompt(comp) {
 function normalizeAnalysis(raw) {
   return {
     identity: String(raw?.identity || "Sin identidad"),
-    playstyle: String(raw?.playstyle || ""),
     summary: String(raw?.summary || ""),
     strengths: Array.isArray(raw?.strengths) ? raw.strengths.slice(0, 3).map(String) : [],
     weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
     missing_roles: Array.isArray(raw?.missing_roles) ? raw.missing_roles.slice(0, 5).map(String) : [],
     recommended_picks: Array.isArray(raw?.recommended_picks) ? raw.recommended_picks.slice(0, 3).map(String) : [],
     win_condition: String(raw?.win_condition || ""),
-    main_threat: String(raw?.main_threat || ""),
-    difficulty: ["Easy", "Medium", "Hard"].includes(raw?.difficulty) ? raw.difficulty : "Medium",
   };
 }
 
@@ -271,7 +245,7 @@ async function loadChampionOptions() {
 
 function findDuplicateChampion(comp) {
   const seen = new Set();
-  for (const [role, champion] of Object.entries(comp)) {
+  for (const champion of Object.values(comp)) {
     if (!champion) continue;
     const key = champion.toLowerCase();
     if (seen.has(key)) return champion;
@@ -347,15 +321,12 @@ async function analyze() {
     } catch {
       parsed = {
         identity: "Respuesta no estructurada",
-        playstyle: "",
         summary: rawText || "No se pudo leer la respuesta.",
         strengths: [],
         weaknesses: [],
         missing_roles: [],
         recommended_picks: [],
         win_condition: "",
-        main_threat: "",
-        difficulty: "Medium",
       };
     }
 
