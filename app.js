@@ -1,5 +1,6 @@
 const STORAGE_KEY = "lol-team-analyzer-settings";
 const DEFAULT_MODEL = "gpt-4o-2024-08-06";
+const CHAMPION_LIST_ID = "championList";
 
 const DEMO = {
   top: "Ornn",
@@ -9,6 +10,15 @@ const DEMO = {
   support: "Lulu",
 };
 
+const FALLBACK_CHAMPIONS = [
+  "Aatrox", "Ahri", "Akali", "Alistar", "Amumu", "Annie", "Ashe", "Aurelion Sol",
+  "Braum", "Caitlyn", "Camille", "Darius", "Diana", "Dr. Mundo", "Ekko", "Ezreal",
+  "Fiora", "Garen", "Gragas", "Janna", "Jax", "Jinx", "Karma", "Kayn", "Leona",
+  "Lulu", "Lux", "Malphite", "Morgana", "Nami", "Nautilus", "Nocturne", "Orianna",
+  "Ornn", "Rakan", "Sejuani", "Sett", "Sivir", "Thresh", "Tristana", "Vi", "Viego",
+  "Wukong", "Xayah", "Yasuo", "Zed", "Zeri", "Ziggs", "Zyra",
+];
+
 const ANALYSIS_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -16,34 +26,13 @@ const ANALYSIS_SCHEMA = {
     identity: { type: "string" },
     playstyle: { type: "string" },
     summary: { type: "string" },
-    strengths: {
-      type: "array",
-      items: { type: "string" },
-      minItems: 1,
-      maxItems: 3,
-    },
-    weaknesses: {
-      type: "array",
-      items: { type: "string" },
-      minItems: 1,
-      maxItems: 3,
-    },
-    missing_roles: {
-      type: "array",
-      items: { type: "string" },
-      maxItems: 5,
-    },
-    recommended_picks: {
-      type: "array",
-      items: { type: "string" },
-      maxItems: 3,
-    },
+    strengths: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 3 },
+    weaknesses: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 3 },
+    missing_roles: { type: "array", items: { type: "string" }, maxItems: 5 },
+    recommended_picks: { type: "array", items: { type: "string" }, maxItems: 3 },
     win_condition: { type: "string" },
     main_threat: { type: "string" },
-    difficulty: {
-      type: "string",
-      enum: ["Easy", "Medium", "Hard"],
-    },
+    difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
   },
   required: [
     "identity",
@@ -70,6 +59,7 @@ const els = {
   demoBtn: document.getElementById("demoBtn"),
   result: document.getElementById("result"),
   statusPill: document.getElementById("statusPill"),
+  championList: document.getElementById(CHAMPION_LIST_ID),
 };
 
 const SYSTEM_PROMPT = `Eres un analista experto de League of Legends.
@@ -114,12 +104,7 @@ function loadSettings() {
 }
 
 function saveSettings() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      apiKey: els.apiKey.value.trim(),
-    })
-  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ apiKey: els.apiKey.value.trim() }));
 }
 
 function setStatus(text) {
@@ -257,9 +242,37 @@ function normalizeAnalysis(raw) {
   };
 }
 
+function renderChampionOptions(names) {
+  if (!els.championList) return;
+  els.championList.innerHTML = names
+    .map((name) => `<option value="${escapeHtml(name)}"></option>`)
+    .join("");
+}
+
+async function loadChampionOptions() {
+  try {
+    const versionsResponse = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
+    const versions = await versionsResponse.json();
+    const version = Array.isArray(versions) && versions.length ? versions[0] : null;
+    if (!version) throw new Error("No Data Dragon version");
+
+    const championsResponse = await fetch(
+      `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`
+    );
+    const champions = await championsResponse.json();
+    const names = Object.values(champions?.data || {})
+      .map((champion) => champion.name)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
+
+    renderChampionOptions(names.length ? names : FALLBACK_CHAMPIONS);
+  } catch {
+    renderChampionOptions(FALLBACK_CHAMPIONS);
+  }
+}
+
 async function analyze() {
   const apiKey = els.apiKey.value.trim();
-  const model = DEFAULT_MODEL;
   const comp = readComposition();
   const hasAnyChampion = Object.values(comp).some(Boolean);
 
@@ -287,7 +300,7 @@ async function analyze() {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model,
+        model: DEFAULT_MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: buildUserPrompt(comp) },
@@ -363,5 +376,6 @@ els.demoBtn.addEventListener("click", fillDemo);
 els.apiKey.addEventListener("change", saveSettings);
 
 loadSettings();
+loadChampionOptions();
 registerServiceWorker();
 renderEmpty("Aquí aparecerá el análisis.");
