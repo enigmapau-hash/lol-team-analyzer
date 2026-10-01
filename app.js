@@ -29,6 +29,14 @@ const INPUT_BY_ROLE = {
   support: "support",
 };
 
+const ROLE_LIST_IDS = {
+  top: "topList",
+  jungle: "jungleList",
+  mid: "midList",
+  botline: "botlineList",
+  support: "supportList",
+};
+
 const DEMO = {
   top: "Aatrox",
   jungle: "Briar",
@@ -47,13 +55,16 @@ const els = {
   demoBtn: document.getElementById("demoBtn"),
   result: document.getElementById("result"),
   statusPill: document.getElementById("statusPill"),
-  championList: document.getElementById("championList"),
+  topList: document.getElementById("topList"),
+  jungleList: document.getElementById("jungleList"),
+  midList: document.getElementById("midList"),
+  botlineList: document.getElementById("botlineList"),
+  supportList: document.getElementById("supportList"),
 };
 
 let draftData = null;
 let championMeta = new Map();
 let workbookReady = false;
-let championMetaReady = false;
 let analyzeQueued = false;
 
 function setStatus(text) {
@@ -102,22 +113,25 @@ function roleInputKey(roleKey) {
   return INPUT_BY_ROLE[roleKey] || roleKey;
 }
 
-function buildChampionList() {
+function getRoleRows(roleKey) {
+  return draftData?.roles?.[roleKey] || [];
+}
+
+function buildChampionList(roleKey) {
   const champions = new Set();
-
-  for (const sheetRows of Object.values(draftData?.roles || {})) {
-    for (const row of sheetRows || []) {
-      if (row?.champion) champions.add(row.champion);
-    }
+  for (const row of getRoleRows(roleKey)) {
+    if (row?.champion) champions.add(row.champion);
   }
-
   return [...champions].sort((a, b) => a.localeCompare(b, "es"));
 }
 
 function renderChampionOptions() {
-  if (!els.championList) return;
-  const names = buildChampionList();
-  els.championList.innerHTML = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+  for (const [roleKey, listId] of Object.entries(ROLE_LIST_IDS)) {
+    const listEl = document.getElementById(listId);
+    if (!listEl) continue;
+    const names = buildChampionList(roleKey);
+    listEl.innerHTML = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+  }
 }
 
 function getChampionMeta(name) {
@@ -125,20 +139,11 @@ function getChampionMeta(name) {
 }
 
 function findRoleRow(roleKey, championName) {
-  const roleRows = draftData?.roles?.[roleKey];
+  const roleRows = getRoleRows(roleKey);
   if (!Array.isArray(roleRows) || !championName) return null;
 
   const target = normalizeText(championName);
   return roleRows.find((row) => normalizeText(row?.champion) === target) || null;
-}
-
-function findChampionAnywhere(championName) {
-  const target = normalizeText(championName);
-  if (!target || !draftData?.roles) return false;
-
-  return Object.values(draftData.roles).some((rows) =>
-    Array.isArray(rows) && rows.some((row) => normalizeText(row?.champion) === target)
-  );
 }
 
 function findDuplicateChampion(comp) {
@@ -149,6 +154,16 @@ function findDuplicateChampion(comp) {
     if (!key) continue;
     if (seen.has(key)) return champion;
     seen.add(key);
+  }
+  return null;
+}
+
+function firstInvalidRole(comp) {
+  for (const role of ROLE_ORDER) {
+    const champ = comp[roleInputKey(role.key)];
+    if (champ && !findRoleRow(role.key, champ)) {
+      return { role: role.label, champion: champ };
+    }
   }
   return null;
 }
@@ -180,7 +195,6 @@ function renderComposition(comp) {
     const data = findRoleRow(role.key, champ);
     const meta = champ ? getChampionMeta(champ) : null;
     const missing = Boolean(champ) && !data;
-    const unknown = Boolean(champ) && !findChampionAnywhere(champ);
 
     const iconMarkup = meta
       ? `<img class="champion-icon" src="${escapeHtml(meta.iconUrl)}" alt="" loading="lazy" />`
@@ -189,7 +203,7 @@ function renderComposition(comp) {
         )}</div>`;
 
     return `
-      <tr class="${missing ? "is-missing" : ""} ${unknown ? "is-unknown" : ""}">
+      <tr class="${missing ? "is-missing" : ""}">
         <td class="role-cell">${escapeHtml(role.label)}</td>
         <td>
           <div class="champion-cell">
@@ -260,15 +274,17 @@ function analyze() {
   }
 
   clearInputValidity();
+  const invalidRole = firstInvalidRole(comp);
+  if (invalidRole) {
+    renderComposition(comp);
+    setStatus(`No válido en ${invalidRole.role}: ${invalidRole.champion}`);
+    return;
+  }
+
   setBusy(true);
   try {
     renderComposition(comp);
-    const unknownChampions = Object.values(comp).filter(Boolean).filter((name) => !findChampionAnywhere(name));
-    if (unknownChampions.length) {
-      setStatus(`Campeón no encontrado: ${unknownChampions[0]}`);
-    } else {
-      setStatus("Listo");
-    }
+    setStatus("Listo");
   } catch (error) {
     renderEmpty(`No se pudo cargar la composición: ${escapeHtml(error.message || "error desconocido")}`);
     setStatus("Error");
@@ -323,10 +339,6 @@ async function loadChampionMeta() {
     );
   } catch {
     championMeta = new Map();
-  } finally {
-    championMetaReady = true;
-    if (workbookReady) renderChampionOptions();
-    if (workbookReady) scheduleAnalyze();
   }
 }
 
