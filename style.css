@@ -123,8 +123,11 @@ label span {
   font-weight: 600;
 }
 
-input,
-select {
+.picker-shell {
+  position: relative;
+}
+
+input {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -135,27 +138,65 @@ select {
   font-size: 1rem;
 }
 
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-input:focus,
-select:focus {
+input:focus {
   border-color: rgba(226, 41, 47, 0.7);
   box-shadow: 0 0 0 3px rgba(226, 41, 47, 0.18);
 }
 
-input.input-error,
-select.input-error {
+input.input-error {
   border-color: rgba(255, 90, 96, 0.95);
   box-shadow: 0 0 0 3px rgba(255, 90, 96, 0.12);
 }
 
-select option {
+.picker-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  max-height: 280px;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
   background: #10141b;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.picker-menu[hidden] {
+  display: none;
+}
+
+.picker-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
   color: var(--text);
+  padding: 10px 12px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.picker-item:hover,
+.picker-item:focus-visible {
+  background: rgba(226, 41, 47, 0.14);
+  outline: none;
+}
+
+.picker-name {
+  font-weight: 600;
+}
+
+.picker-empty {
+  padding: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .actions {
