@@ -1,0 +1,16 @@
+{
+  "name": "lol-team-analyzer",
+  "version": "0.4.0-alpha",
+  "private": true,
+  "description": "Mini app de League of Legends basada en la pestaña Composición del Excel.",
+  "type": "commonjs",
+  "scripts": {
+    "extract:workbook": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\" draft-pool.json",
+    "extract:workbook:stdout": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\"",
+    "validate:cases": "node tools/validate-cases.cjs",
+    "audit:stage1": "npm run validate:cases"
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
