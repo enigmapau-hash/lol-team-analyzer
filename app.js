@@ -28,6 +28,16 @@ const ANALYSIS_SCHEMA = {
       minItems: 1,
       maxItems: 3,
     },
+    missing_roles: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 5,
+    },
+    recommended_picks: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 3,
+    },
     win_condition: { type: "string" },
     main_threat: { type: "string" },
     difficulty: {
@@ -41,6 +51,8 @@ const ANALYSIS_SCHEMA = {
     "summary",
     "strengths",
     "weaknesses",
+    "missing_roles",
+    "recommended_picks",
     "win_condition",
     "main_threat",
     "difficulty",
@@ -64,7 +76,10 @@ const els = {
 const SYSTEM_PROMPT = `Eres un analista experto de League of Legends.
 Responde siempre en español, de forma breve y precisa.
 
-Analiza una composición de 5 campeones.
+Analiza la composición actual, aunque esté incompleta.
+Si faltan roles, explica qué falta y recomienda picks útiles para completar el draft.
+Si la composición está completa, céntrate en la lectura final del equipo.
+
 Devuelve solo JSON válido y exactamente con esta estructura:
 {
   "identity": "string",
@@ -72,6 +87,8 @@ Devuelve solo JSON válido y exactamente con esta estructura:
   "summary": "string",
   "strengths": ["string", "string", "string"],
   "weaknesses": ["string", "string", "string"],
+  "missing_roles": ["string"],
+  "recommended_picks": ["string"],
   "win_condition": "string",
   "main_threat": "string",
   "difficulty": "Easy|Medium|Hard"
@@ -82,6 +99,8 @@ Reglas:
 - Frases cortas.
 - summary: una sola frase muy clara, máximo 18 palabras.
 - playstyle: una etiqueta breve, por ejemplo "Front to Back", "Pick", "Dive", "Poke" o "Skirmish".
+- missing_roles: lista corta con los roles que faltan, o vacía si no falta ninguno.
+- recommended_picks: hasta 3 campeones útiles para completar el draft, o vacía si no aplica.
 - win_condition: una frase práctica y concreta.
 - Sin markdown.
 - Sin explicaciones.
@@ -129,6 +148,16 @@ function readComposition() {
   };
 }
 
+function roleLabel(key) {
+  return {
+    top: "Top",
+    jungle: "Jungle",
+    mid: "Mid",
+    adc: "ADC",
+    support: "Support",
+  }[key] || key;
+}
+
 function renderEmpty(message) {
   els.result.className = "result-empty";
   els.result.innerHTML = message;
@@ -166,19 +195,30 @@ function renderAnalysis(data) {
         <div class="value">${escapeHtml(data.main_threat || "-")}</div>
       </div>
       <div class="metric">
-        <span class="label">Fortalezas</span>
-        ${renderList(data.strengths)}
+        <span class="label">Faltan roles</span>
+        ${renderList(data.missing_roles && data.missing_roles.map(roleLabel))}
       </div>
     </div>
 
     <div class="result-grid">
       <div class="metric">
+        <span class="label">Fortalezas</span>
+        ${renderList(data.strengths)}
+      </div>
+      <div class="metric">
         <span class="label">Debilidades</span>
         ${renderList(data.weaknesses)}
       </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="metric">
+        <span class="label">Picks recomendados</span>
+        ${renderList(data.recommended_picks)}
+      </div>
       <div class="metric">
         <span class="label">Lectura rápida</span>
-        <div class="value">${escapeHtml(data.playstyle || "-")}</div>
+        <div class="value">${escapeHtml(data.summary || data.playstyle || "-")}</div>
       </div>
     </div>
   `;
@@ -194,7 +234,19 @@ function escapeHtml(value) {
 }
 
 function buildUserPrompt(comp) {
-  return `Analiza esta composición de League of Legends:\n\nTop: ${comp.top}\nJungle: ${comp.jungle}\nMid: ${comp.mid}\nADC: ${comp.adc}\nSupport: ${comp.support}\n\nQuiero una lectura sencilla, clara y muy breve.`;
+  const lines = [
+    "Analiza esta composición de League of Legends:",
+    "",
+    `Top: ${comp.top || "(vacío)"}`,
+    `Jungle: ${comp.jungle || "(vacío)"}`,
+    `Mid: ${comp.mid || "(vacío)"}`,
+    `ADC: ${comp.adc || "(vacío)"}`,
+    `Support: ${comp.support || "(vacío)"}`,
+    "",
+    "Si faltan roles, analiza el draft parcial y recomiéndalos.",
+    "Quiero una lectura sencilla, clara y muy breve.",
+  ];
+  return lines.join("\n");
 }
 
 function normalizeAnalysis(raw) {
@@ -204,6 +256,8 @@ function normalizeAnalysis(raw) {
     summary: String(raw?.summary || ""),
     strengths: Array.isArray(raw?.strengths) ? raw.strengths.slice(0, 3).map(String) : [],
     weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
+    missing_roles: Array.isArray(raw?.missing_roles) ? raw.missing_roles.slice(0, 5).map(String) : [],
+    recommended_picks: Array.isArray(raw?.recommended_picks) ? raw.recommended_picks.slice(0, 3).map(String) : [],
     win_condition: String(raw?.win_condition || ""),
     main_threat: String(raw?.main_threat || ""),
     difficulty: ["Easy", "Medium", "Hard"].includes(raw?.difficulty) ? raw.difficulty : "Medium",
@@ -214,6 +268,7 @@ async function analyze() {
   const apiKey = els.apiKey.value.trim();
   const model = els.modelName.value.trim() || DEFAULT_MODEL;
   const comp = readComposition();
+  const hasAnyChampion = Object.values(comp).some(Boolean);
 
   if (!apiKey) {
     renderEmpty("Falta la API key. Escríbela arriba para poder analizar.");
@@ -221,8 +276,8 @@ async function analyze() {
     return;
   }
 
-  if (!Object.values(comp).every(Boolean)) {
-    renderEmpty("Completa los cinco roles antes de analizar.");
+  if (!hasAnyChampion) {
+    renderEmpty("Escribe al menos un campeón para analizar el draft.");
     setStatus("Faltan campeones");
     return;
   }
@@ -274,6 +329,8 @@ async function analyze() {
         summary: rawText || "No se pudo leer la respuesta.",
         strengths: [],
         weaknesses: [],
+        missing_roles: [],
+        recommended_picks: [],
         win_condition: "",
         main_threat: "",
         difficulty: "Medium",
