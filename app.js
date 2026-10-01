@@ -7,6 +7,33 @@ const DEMO = {
   support: "Lulu",
 };
 
+const ANALYSIS_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    identity: { type: "string" },
+    strengths: {
+      type: "array",
+      items: { type: "string" },
+      minItems: 1,
+      maxItems: 3,
+    },
+    weaknesses: {
+      type: "array",
+      items: { type: "string" },
+      minItems: 1,
+      maxItems: 3,
+    },
+    win_condition: { type: "string" },
+    main_threat: { type: "string" },
+    difficulty: {
+      type: "string",
+      enum: ["Easy", "Medium", "Hard"],
+    },
+  },
+  required: ["identity", "strengths", "weaknesses", "win_condition", "main_threat", "difficulty"],
+};
+
 const els = {
   apiKey: document.getElementById("apiKey"),
   modelName: document.getElementById("modelName"),
@@ -22,27 +49,26 @@ const els = {
 };
 
 const SYSTEM_PROMPT = `Eres un analista experto de League of Legends.
-Responde en español, de forma breve y precisa.
+Responde siempre en español, de forma breve y precisa.
 
 Analiza una composición de 5 campeones.
-Devuelve solo JSON válido, sin markdown ni texto extra.
-
-Estructura exacta:
+Devuelve solo JSON válido y exactamente con esta estructura:
 {
   "identity": "string",
   "strengths": ["string", "string", "string"],
   "weaknesses": ["string", "string", "string"],
   "win_condition": "string",
-  "counters": ["string", "string", "string"],
-  "synergies": ["string", "string", "string"],
+  "main_threat": "string",
   "difficulty": "Easy|Medium|Hard"
 }
 
 Reglas:
 - Máximo 3 puntos por lista.
 - Frases cortas.
-- Sin explicaciones largas.
-- Si algo es dudoso, prioriza la lectura más útil para draft y teamfight.`;
+- Sin markdown.
+- Sin explicaciones.
+- Sin campos extra.
+- Si no estás seguro, prioriza una lectura útil para draft y teamfights.`;
 
 function loadSettings() {
   try {
@@ -89,12 +115,13 @@ function renderEmpty(message) {
   els.result.innerHTML = message;
 }
 
-function renderAnalysis(data) {
-  const strengths = Array.isArray(data.strengths) ? data.strengths : [];
-  const weaknesses = Array.isArray(data.weaknesses) ? data.weaknesses : [];
-  const counters = Array.isArray(data.counters) ? data.counters : [];
-  const synergies = Array.isArray(data.synergies) ? data.synergies : [];
+function renderList(items) {
+  return Array.isArray(items) && items.length
+    ? `<ul class="list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+    : `<div class="empty-small">-</div>`;
+}
 
+function renderAnalysis(data) {
   els.result.className = "result-box";
   els.result.innerHTML = `
     <div class="badge-row">
@@ -108,30 +135,19 @@ function renderAnalysis(data) {
         <div class="value">${escapeHtml(data.win_condition || "-")}</div>
       </div>
       <div class="metric">
-        <span class="label">Lectura rápida</span>
-        <div class="value">Teamfight / draft / tempo</div>
+        <span class="label">Amenaza principal</span>
+        <div class="value">${escapeHtml(data.main_threat || "-")}</div>
       </div>
     </div>
 
     <div class="result-grid">
       <div class="metric">
         <span class="label">Fortalezas</span>
-        <ul class="list">${strengths.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        ${renderList(data.strengths)}
       </div>
       <div class="metric">
         <span class="label">Debilidades</span>
-        <ul class="list">${weaknesses.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-      </div>
-    </div>
-
-    <div class="result-grid">
-      <div class="metric">
-        <span class="label">Counters</span>
-        <ul class="list">${counters.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-      </div>
-      <div class="metric">
-        <span class="label">Sinergias</span>
-        <ul class="list">${synergies.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        ${renderList(data.weaknesses)}
       </div>
     </div>
   `;
@@ -148,6 +164,28 @@ function escapeHtml(value) {
 
 function buildUserPrompt(comp) {
   return `Analiza esta composición de League of Legends:\n\nTop: ${comp.top}\nJungle: ${comp.jungle}\nMid: ${comp.mid}\nADC: ${comp.adc}\nSupport: ${comp.support}\n\nQuiero un análisis sencillo, claro y breve.`;
+}
+
+function extractText(data) {
+  const output = Array.isArray(data?.output) ? data.output : [];
+  for (const item of output) {
+    const content = Array.isArray(item?.content) ? item.content : [];
+    for (const part of content) {
+      if (typeof part?.text === "string") return part.text;
+    }
+  }
+  return "";
+}
+
+function normalizeAnalysis(raw) {
+  return {
+    identity: String(raw?.identity || "Sin identidad"),
+    strengths: Array.isArray(raw?.strengths) ? raw.strengths.slice(0, 3).map(String) : [],
+    weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
+    win_condition: String(raw?.win_condition || ""),
+    main_threat: String(raw?.main_threat || ""),
+    difficulty: ["Easy", "Medium", "Hard"].includes(raw?.difficulty) ? raw.difficulty : "Medium",
+  };
 }
 
 async function analyze() {
@@ -190,6 +228,14 @@ async function analyze() {
             content: [{ type: "text", text: buildUserPrompt(comp) }],
           },
         ],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "team_analysis",
+            strict: true,
+            schema: ANALYSIS_SCHEMA,
+          },
+        },
       }),
     });
 
@@ -211,13 +257,12 @@ async function analyze() {
         strengths: [rawText || "No se pudo leer la respuesta."],
         weaknesses: [],
         win_condition: "",
-        counters: [],
-        synergies: [],
+        main_threat: "",
         difficulty: "Medium",
       };
     }
 
-    renderAnalysis(parsed);
+    renderAnalysis(normalizeAnalysis(parsed));
     setStatus("Listo");
   } catch (error) {
     renderEmpty(`No se pudo analizar: ${escapeHtml(error.message || "error desconocido")}`);
@@ -225,17 +270,6 @@ async function analyze() {
   } finally {
     setBusy(false);
   }
-}
-
-function extractText(data) {
-  const output = Array.isArray(data?.output) ? data.output : [];
-  for (const item of output) {
-    const content = Array.isArray(item?.content) ? item.content : [];
-    for (const part of content) {
-      if (typeof part?.text === "string") return part.text;
-    }
-  }
-  return "";
 }
 
 function fillDemo() {
