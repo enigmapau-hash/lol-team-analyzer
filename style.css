@@ -188,6 +188,11 @@ button.secondary {
   padding: 10px;
 }
 
+.empty-small {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
 .result-box {
   display: grid;
   gap: 14px;
