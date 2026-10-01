@@ -8,13 +8,14 @@
     "audit:excel": "node tools/check-workbook.cjs \"Draft Pool.xlsx\"",
     "audit:excel:report": "node tools/check-workbook.cjs \"Draft Pool.xlsx\" > workbook-report.json",
     "audit:composition": "node tools/audit-composition.cjs \"Draft Pool.xlsx\" tests/cases.json",
+    "audit:all": "node tools/run-audit-suite.cjs \"Draft Pool.xlsx\" tests/cases.json",
     "extract:workbook": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\" draft-pool.json",
     "extract:workbook:stdout": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\"",
     "validate:cases": "node tools/validate-cases.cjs",
     "generate:cases": "node tools/generate-cases-from-workbook.cjs draft-pool.json tests/cases.json",
     "report:cases": "node tools/report-cases.cjs",
     "audit:stage1": "npm run audit:excel && npm run audit:composition",
-    "audit:stage1:full": "npm run audit:excel && npm run audit:composition",
+    "audit:stage1:full": "npm run audit:all",
     "version:sync": "node tools/bump-version.cjs"
   },
   "devDependencies": {
