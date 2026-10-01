@@ -1,4 +1,7 @@
-const WORKBOOK_URL = encodeURI("Draft Pool.xlsx");
+const WORKBOOK_URLS = [
+  "https://raw.githubusercontent.com/enigmapau-hash/lol-team-analyzer/main/Draft%20Pool.xlsx",
+  encodeURI("Draft Pool.xlsx"),
+];
 const DDragonVersionsURL = "https://ddragon.leagueoflegends.com/api/versions.json";
 const DDragonChampionDataURL = (version) =>
   `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`;
@@ -388,49 +391,54 @@ async function loadChampionMeta() {
 }
 
 async function loadWorkbook() {
-  try {
-    if (typeof XLSX === "undefined") {
-      throw new Error("No se pudo cargar la librería XLSX");
-    }
-
-    const response = await fetch(WORKBOOK_URL, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const buffer = await response.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: "array" });
-
-    const roles = {};
-    for (const [roleKey, sheetName] of Object.entries(SHEET_MAP)) {
-      const sheet = workbook.Sheets[sheetName];
-      if (!sheet) {
-        throw new Error(`Falta la hoja ${sheetName}`);
+  for (const url of WORKBOOK_URLS) {
+    try {
+      if (typeof XLSX === "undefined") {
+        throw new Error("No se pudo cargar la librería XLSX");
       }
 
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-      roles[roleKey] = rows
-        .map((row) => ({
-          champion: String(row["Campeón"] || "").trim(),
-          identity: String(row["Identidad"] || "").trim(),
-          function: String(row["Función"] || "").trim(),
-          tempo: String(row["Ritmo"] || "").trim(),
-          strengths: String(row["Fortalezas"] || "").trim(),
-          weaknesses: String(row["Debilidades"] || "").trim(),
-        }))
-        .filter((row) => row.champion);
-    }
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    draftData = { roles };
-    workbookReady = true;
-    renderChampionOptions();
-    setStatus("Base cargada");
-    scheduleAnalyze();
-  } catch (error) {
-    draftData = null;
-    workbookReady = false;
-    renderChampionOptions();
-    setStatus("Sin base");
-    renderEmpty(`No se ha podido leer el Excel: ${escapeHtml(error.message || "error")}`);
+      const buffer = await response.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+
+      const roles = {};
+      for (const [roleKey, sheetName] of Object.entries(SHEET_MAP)) {
+        const sheet = workbook.Sheets[sheetName];
+        if (!sheet) {
+          throw new Error(`Falta la hoja ${sheetName}`);
+        }
+
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        roles[roleKey] = rows
+          .map((row) => ({
+            champion: String(row["Campeón"] || "").trim(),
+            identity: String(row["Identidad"] || "").trim(),
+            function: String(row["Función"] || "").trim(),
+            tempo: String(row["Ritmo"] || "").trim(),
+            strengths: String(row["Fortalezas"] || "").trim(),
+            weaknesses: String(row["Debilidades"] || "").trim(),
+          }))
+          .filter((row) => row.champion);
+      }
+
+      draftData = { roles };
+      workbookReady = true;
+      renderChampionOptions();
+      setStatus("Base cargada");
+      scheduleAnalyze();
+      return;
+    } catch (error) {
+      console.warn(`No se pudo cargar el workbook desde ${url}:`, error);
+    }
   }
+
+  draftData = null;
+  workbookReady = false;
+  renderChampionOptions();
+  setStatus("Sin base");
+  renderEmpty("No se ha podido leer el Excel.");
 }
 
 function bindPickers() {
@@ -450,37 +458,23 @@ function bindPickers() {
       if (event.key === "Escape") {
         closeRoleMenu(role.key);
       }
-      if (event.key === "Enter") {
-        event.preventDefault();
-        const firstOption = menu.querySelector(".picker-item");
-        if (firstOption) {
-          const championName = firstOption.getAttribute("data-champion") || "";
-          if (championName) selectChampion(role.key, championName);
-        } else {
-          closeRoleMenu(role.key);
-          scheduleAnalyze();
-        }
-      }
-    });
-    input.addEventListener("blur", () => {
-      window.setTimeout(() => {
-        if (activeRoleKey === role.key) closeRoleMenu(role.key);
-      }, 120);
-    });
-
-    menu.addEventListener("mousedown", (event) => {
-      const button = event.target.closest(".picker-item");
-      if (!button) return;
-      event.preventDefault();
-      const championName = button.getAttribute("data-champion") || "";
-      if (championName) selectChampion(role.key, championName);
     });
   }
 
-  document.addEventListener("pointerdown", (event) => {
-    if (!event.target.closest(".picker-shell")) {
-      closeAllMenus();
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const item = target.closest(".picker-item");
+    if (item) {
+      const roleKey = item.getAttribute("data-role");
+      const championName = item.getAttribute("data-champion");
+      if (roleKey && championName) selectChampion(roleKey, championName);
+      return;
     }
+
+    const clickedPicker = target.closest(".picker-shell");
+    if (!clickedPicker) closeAllMenus();
   });
 }
 
