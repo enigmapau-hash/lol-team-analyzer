@@ -16,7 +16,7 @@
         <div>
           <p class="eyebrow">Rift Architect</p>
           <h1>LoL Team Analyzer</h1>
-          <p class="subhead">Selecciona campeones y la IA te devuelve una lectura breve del draft, incluso si está incompleto.</p>
+          <p class="subhead">Escribe campeones y la IA te devuelve una lectura breve del draft, incluso si está incompleto.</p>
         </div>
         <div class="status-pill" id="statusPill">Listo</div>
       </header>
@@ -43,23 +43,23 @@
         <div class="roles-grid">
           <label>
             <span>Top</span>
-            <input id="top" type="text" placeholder="Ornn" />
+            <input id="top" list="championList" type="text" placeholder="Ornn" />
           </label>
           <label>
             <span>Jungle</span>
-            <input id="jungle" type="text" placeholder="Vi" />
+            <input id="jungle" list="championList" type="text" placeholder="Vi" />
           </label>
           <label>
             <span>Mid</span>
-            <input id="mid" type="text" placeholder="Ahri" />
+            <input id="mid" list="championList" type="text" placeholder="Ahri" />
           </label>
           <label>
             <span>ADC</span>
-            <input id="adc" type="text" placeholder="Jinx" />
+            <input id="adc" list="championList" type="text" placeholder="Jinx" />
           </label>
           <label>
             <span>Support</span>
-            <input id="support" type="text" placeholder="Lulu" />
+            <input id="support" list="championList" type="text" placeholder="Lulu" />
           </label>
         </div>
 
@@ -80,6 +80,7 @@
       </section>
     </main>
 
+    <datalist id="championList"></datalist>
     <script src="app.js"></script>
   </body>
 </html>
