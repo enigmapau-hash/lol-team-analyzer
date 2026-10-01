@@ -139,6 +139,11 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(226, 41, 47, 0.18);
 }
 
+input.input-error {
+  border-color: rgba(255, 90, 96, 0.95);
+  box-shadow: 0 0 0 3px rgba(255, 90, 96, 0.12);
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -195,7 +200,7 @@ button.secondary {
 .composition-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 980px;
+  min-width: 1080px;
 }
 
 .composition-table th,
@@ -224,9 +229,53 @@ button.secondary {
   color: #ffb9bd;
 }
 
+.composition-table tbody tr.is-unknown td {
+  background: rgba(255, 90, 96, 0.06);
+}
+
 .role-cell {
   font-weight: 700;
   color: var(--accent-2);
+}
+
+.champion-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.champion-copy {
+  min-width: 0;
+}
+
+.champion-name {
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.champion-sub {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.champion-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+}
+
+.champion-icon.placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 @media (max-width: 980px) {
