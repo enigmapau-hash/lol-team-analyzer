@@ -29,29 +29,29 @@
       <section class="card form-card">
         <div class="card-head">
           <h2>Composición</h2>
-          <p>Rellena los 5 roles. La tabla se actualiza sola.</p>
+          <p>Rellena los 5 roles. Cada uno usa su propia tabla.</p>
         </div>
 
         <div class="roles-grid">
           <label>
             <span>Top</span>
-            <input id="top" list="championList" type="text" placeholder="Aatrox" spellcheck="false" />
+            <input id="top" list="topList" type="text" placeholder="Aatrox" spellcheck="false" />
           </label>
           <label>
             <span>Jungla</span>
-            <input id="jungle" list="championList" type="text" placeholder="Briar" spellcheck="false" />
+            <input id="jungle" list="jungleList" type="text" placeholder="Briar" spellcheck="false" />
           </label>
           <label>
             <span>Mid</span>
-            <input id="mid" list="championList" type="text" placeholder="Anivia" spellcheck="false" />
+            <input id="mid" list="midList" type="text" placeholder="Anivia" spellcheck="false" />
           </label>
           <label>
             <span>Botline</span>
-            <input id="adc" list="championList" type="text" placeholder="Draven" spellcheck="false" />
+            <input id="adc" list="botlineList" type="text" placeholder="Draven" spellcheck="false" />
           </label>
           <label>
             <span>Support</span>
-            <input id="support" list="championList" type="text" placeholder="Janna" spellcheck="false" />
+            <input id="support" list="supportList" type="text" placeholder="Janna" spellcheck="false" />
           </label>
         </div>
 
@@ -70,7 +70,11 @@
       </section>
     </main>
 
-    <datalist id="championList"></datalist>
+    <datalist id="topList"></datalist>
+    <datalist id="jungleList"></datalist>
+    <datalist id="midList"></datalist>
+    <datalist id="botlineList"></datalist>
+    <datalist id="supportList"></datalist>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="app.js"></script>
   </body>
