@@ -123,7 +123,8 @@ label span {
   font-weight: 600;
 }
 
-input {
+input,
+select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -134,14 +135,27 @@ input {
   font-size: 1rem;
 }
 
-input:focus {
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+input:focus,
+select:focus {
   border-color: rgba(226, 41, 47, 0.7);
   box-shadow: 0 0 0 3px rgba(226, 41, 47, 0.18);
 }
 
-input.input-error {
+input.input-error,
+select.input-error {
   border-color: rgba(255, 90, 96, 0.95);
   box-shadow: 0 0 0 3px rgba(255, 90, 96, 0.12);
+}
+
+select option {
+  background: #10141b;
+  color: var(--text);
 }
 
 .actions {
