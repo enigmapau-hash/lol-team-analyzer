@@ -8,6 +8,7 @@
     "extract:workbook": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\" draft-pool.json",
     "extract:workbook:stdout": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\"",
     "validate:cases": "node tools/validate-cases.cjs",
+    "generate:cases": "node tools/generate-cases-from-workbook.cjs draft-pool.json tests/cases.json",
     "audit:stage1": "npm run validate:cases"
   },
   "devDependencies": {
