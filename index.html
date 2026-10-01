@@ -20,7 +20,7 @@
           <p class="eyebrow">Rift Architect</p>
           <h1>LoL Team Analyzer</h1>
           <p class="subhead">
-            La app replica la pestaña <strong>Composición</strong> leyendo el Excel del repositorio.
+            La app replica la pestaña <strong>Composición</strong> leyendo el Excel del repositorio y se actualiza al escribir.
           </p>
         </div>
         <div class="status-pill" id="statusPill">Listo</div>
@@ -29,29 +29,29 @@
       <section class="card form-card">
         <div class="card-head">
           <h2>Composición</h2>
-          <p>Rellena los 5 roles y pulsa analizar.</p>
+          <p>Rellena los 5 roles. La tabla se actualiza sola.</p>
         </div>
 
         <div class="roles-grid">
           <label>
             <span>Top</span>
-            <input id="top" list="championList" type="text" placeholder="Aatrox" />
+            <input id="top" list="championList" type="text" placeholder="Aatrox" spellcheck="false" />
           </label>
           <label>
             <span>Jungla</span>
-            <input id="jungle" list="championList" type="text" placeholder="Briar" />
+            <input id="jungle" list="championList" type="text" placeholder="Briar" spellcheck="false" />
           </label>
           <label>
             <span>Mid</span>
-            <input id="mid" list="championList" type="text" placeholder="Anivia" />
+            <input id="mid" list="championList" type="text" placeholder="Anivia" spellcheck="false" />
           </label>
           <label>
             <span>Botline</span>
-            <input id="adc" list="championList" type="text" placeholder="Draven" />
+            <input id="adc" list="championList" type="text" placeholder="Draven" spellcheck="false" />
           </label>
           <label>
             <span>Support</span>
-            <input id="support" list="championList" type="text" placeholder="Janna" />
+            <input id="support" list="championList" type="text" placeholder="Janna" spellcheck="false" />
           </label>
         </div>
 
