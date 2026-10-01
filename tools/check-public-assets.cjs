@@ -3,6 +3,7 @@
 /*
  * Validate local asset references from index.html.
  * This catches 404-prone links before the app is published.
+ * It also flags legacy UI hooks that should be removed in a later cleanup.
  *
  * Usage:
  *   node tools/check-public-assets.cjs
@@ -49,6 +50,7 @@ function main() {
   }
 
   const checks = [];
+  const warnings = [];
   let ok = true;
 
   for (const ref of [...refs].sort()) {
@@ -64,11 +66,16 @@ function main() {
     if (!exists) ok = false;
   }
 
+  if (html.includes('id="pickerBackdrop"') || html.includes("id='pickerBackdrop'")) {
+    warnings.push('Legacy picker backdrop still exists in index.html. Remove it once the unified picker flow is fully verified.');
+  }
+
   const report = {
     source: path.basename(INDEX_PATH),
     generatedAt: new Date().toISOString(),
     referenceCount: checks.length,
     ok,
+    warnings,
     checks,
   };
 
