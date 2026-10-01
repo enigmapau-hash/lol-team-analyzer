@@ -1,12 +1,14 @@
 # Changelog
 
-## v0.4.0-alpha
+## v1.0.0
 
 ### Added
-- Badge de versión fijo en la esquina.
-- Panel de revisión con estado, resumen y pendientes.
-- Archivo `version.json` como fuente única de la versión.
+- Selector unificado y estable.
+- Lectura directa del Excel.
+- Reproducción de la pestaña **Composición**.
+- Responsive para móvil, tablet y escritorio.
+- Sin IA ni pasos intermedios.
 
 ### Notes
-- La versión visible sirve como guía de revisión rápida.
-- La base sigue siendo el Excel del repositorio.
+- Base cerrada de la miniapp.
+- Las mejoras futuras se tratarán como nuevas versiones menores.
