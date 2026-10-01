@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#111318" />
-    <meta name="description" content="Mini app de composiciones de League of Legends basada en datos locales." />
+    <meta
+      name="description"
+      content="Mini app de League of Legends basada en la pestaña Composición del Excel."
+    />
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="style.css" />
@@ -16,7 +19,9 @@
         <div>
           <p class="eyebrow">Rift Architect</p>
           <h1>LoL Team Analyzer</h1>
-          <p class="subhead">La app reproduce la lógica de la hoja Composiciones usando la base local del draft.</p>
+          <p class="subhead">
+            La app replica la pestaña <strong>Composición</strong> leyendo el Excel del repositorio.
+          </p>
         </div>
         <div class="status-pill" id="statusPill">Listo</div>
       </header>
@@ -24,29 +29,29 @@
       <section class="card form-card">
         <div class="card-head">
           <h2>Composición</h2>
-          <p>Rellena los roles y analiza.</p>
+          <p>Rellena los 5 roles y pulsa analizar.</p>
         </div>
 
         <div class="roles-grid">
           <label>
             <span>Top</span>
-            <input id="top" list="championList" type="text" placeholder="Ornn" />
+            <input id="top" list="championList" type="text" placeholder="Aatrox" />
           </label>
           <label>
-            <span>Jungle</span>
-            <input id="jungle" list="championList" type="text" placeholder="Vi" />
+            <span>Jungla</span>
+            <input id="jungle" list="championList" type="text" placeholder="Briar" />
           </label>
           <label>
             <span>Mid</span>
-            <input id="mid" list="championList" type="text" placeholder="Ahri" />
+            <input id="mid" list="championList" type="text" placeholder="Anivia" />
           </label>
           <label>
-            <span>ADC</span>
-            <input id="adc" list="championList" type="text" placeholder="Jinx" />
+            <span>Botline</span>
+            <input id="adc" list="championList" type="text" placeholder="Draven" />
           </label>
           <label>
             <span>Support</span>
-            <input id="support" list="championList" type="text" placeholder="Lulu" />
+            <input id="support" list="championList" type="text" placeholder="Janna" />
           </label>
         </div>
 
@@ -59,15 +64,14 @@
       <section class="card result-card">
         <div class="card-head">
           <h2>Resultado</h2>
-          <p>Salida breve y directa.</p>
+          <p>Salida igual al Excel.</p>
         </div>
-        <div id="result" class="result-empty">
-          Aquí aparecerá el análisis.
-        </div>
+        <div id="result" class="result-empty">Aquí aparecerá la tabla Composición.</div>
       </section>
     </main>
 
     <datalist id="championList"></datalist>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
