@@ -1,4 +1,6 @@
 const STORAGE_KEY = "lol-team-analyzer-settings";
+const DEFAULT_MODEL = "gpt-4o-2024-08-06";
+
 const DEMO = {
   top: "Ornn",
   jungle: "Vi",
@@ -6,8 +8,6 @@ const DEMO = {
   adc: "Jinx",
   support: "Lulu",
 };
-
-const DEFAULT_MODEL = "gpt-4o-2024-08-06";
 
 const ANALYSIS_SCHEMA = {
   type: "object",
@@ -61,7 +61,6 @@ const ANALYSIS_SCHEMA = {
 
 const els = {
   apiKey: document.getElementById("apiKey"),
-  modelName: document.getElementById("modelName"),
   top: document.getElementById("top"),
   jungle: document.getElementById("jungle"),
   mid: document.getElementById("mid"),
@@ -74,7 +73,7 @@ const els = {
 };
 
 const SYSTEM_PROMPT = `Eres un analista experto de League of Legends.
-Responde siempre en español, de forma breve y precisa.
+Responde siempre en español, breve y directo.
 
 Analiza la composición actual, aunque esté incompleta.
 Si faltan roles, explica qué falta y recomienda picks útiles para completar el draft.
@@ -98,23 +97,19 @@ Reglas:
 - Máximo 3 puntos por lista.
 - Frases cortas.
 - summary: una sola frase muy clara, máximo 18 palabras.
-- playstyle: una etiqueta breve, por ejemplo "Front to Back", "Pick", "Dive", "Poke" o "Skirmish".
-- missing_roles: lista corta con los roles que faltan, o vacía si no falta ninguno.
-- recommended_picks: hasta 3 campeones útiles para completar el draft, o vacía si no aplica.
-- win_condition: una frase práctica y concreta.
+- playstyle: una etiqueta breve.
+- missing_roles: vacío si no falta nadie.
+- recommended_picks: hasta 3 campeones útiles, o vacío si no aplica.
 - Sin markdown.
 - Sin explicaciones.
-- Sin campos extra.
-- Prioriza teamfights, sinergias, curva de poder y condición de victoria.`;
+- Sin campos extra.`;
 
 function loadSettings() {
   try {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     if (data.apiKey) els.apiKey.value = data.apiKey;
-    if (data.modelName) els.modelName.value = data.modelName;
-    if (!data.modelName) els.modelName.value = DEFAULT_MODEL;
   } catch {
-    els.modelName.value = DEFAULT_MODEL;
+    // ignore
   }
 }
 
@@ -123,7 +118,6 @@ function saveSettings() {
     STORAGE_KEY,
     JSON.stringify({
       apiKey: els.apiKey.value.trim(),
-      modelName: els.modelName.value.trim() || DEFAULT_MODEL,
     })
   );
 }
@@ -175,7 +169,7 @@ function renderAnalysis(data) {
     <div class="badge-row">
       <span class="badge">${escapeHtml(data.identity || "Sin identidad")}</span>
       <span class="badge warn">${escapeHtml(data.playstyle || "Playstyle")}</span>
-      <span class="badge red">Dificultad: ${escapeHtml(data.difficulty || "Medium")}</span>
+      <span class="badge red">${escapeHtml(data.difficulty || "Medium")}</span>
     </div>
 
     <div class="result-grid">
@@ -195,8 +189,8 @@ function renderAnalysis(data) {
         <div class="value">${escapeHtml(data.main_threat || "-")}</div>
       </div>
       <div class="metric">
-        <span class="label">Faltan roles</span>
-        ${renderList(data.missing_roles && data.missing_roles.map(roleLabel))}
+        <span class="label">Roles que faltan</span>
+        ${renderList((data.missing_roles || []).map(roleLabel))}
       </div>
     </div>
 
@@ -234,7 +228,7 @@ function escapeHtml(value) {
 }
 
 function buildUserPrompt(comp) {
-  const lines = [
+  return [
     "Analiza esta composición de League of Legends:",
     "",
     `Top: ${comp.top || "(vacío)"}`,
@@ -245,8 +239,7 @@ function buildUserPrompt(comp) {
     "",
     "Si faltan roles, analiza el draft parcial y recomiéndalos.",
     "Quiero una lectura sencilla, clara y muy breve.",
-  ];
-  return lines.join("\n");
+  ].join("\n");
 }
 
 function normalizeAnalysis(raw) {
@@ -266,7 +259,7 @@ function normalizeAnalysis(raw) {
 
 async function analyze() {
   const apiKey = els.apiKey.value.trim();
-  const model = els.modelName.value.trim() || DEFAULT_MODEL;
+  const model = DEFAULT_MODEL;
   const comp = readComposition();
   const hasAnyChampion = Object.values(comp).some(Boolean);
 
@@ -368,7 +361,6 @@ async function registerServiceWorker() {
 els.analyzeBtn.addEventListener("click", analyze);
 els.demoBtn.addEventListener("click", fillDemo);
 els.apiKey.addEventListener("change", saveSettings);
-els.modelName.addEventListener("change", saveSettings);
 
 loadSettings();
 registerServiceWorker();
