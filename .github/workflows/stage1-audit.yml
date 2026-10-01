@@ -22,7 +22,14 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run full stage 1 audit
-        run: npm run audit:stage1:full
+      - name: Run consolidated audit
+        run: npm run audit:all > stage1-audit.json
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage1-audit-report
+          path: stage1-audit.json
+          if-no-files-found: error
