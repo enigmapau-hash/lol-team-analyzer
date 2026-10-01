@@ -244,9 +244,7 @@ function normalizeAnalysis(raw) {
 
 function renderChampionOptions(names) {
   if (!els.championList) return;
-  els.championList.innerHTML = names
-    .map((name) => `<option value="${escapeHtml(name)}"></option>`)
-    .join("");
+  els.championList.innerHTML = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
 }
 
 async function loadChampionOptions() {
@@ -271,6 +269,17 @@ async function loadChampionOptions() {
   }
 }
 
+function findDuplicateChampion(comp) {
+  const seen = new Set();
+  for (const [role, champion] of Object.entries(comp)) {
+    if (!champion) continue;
+    const key = champion.toLowerCase();
+    if (seen.has(key)) return champion;
+    seen.add(key);
+  }
+  return null;
+}
+
 async function analyze() {
   const apiKey = els.apiKey.value.trim();
   const comp = readComposition();
@@ -285,6 +294,13 @@ async function analyze() {
   if (!hasAnyChampion) {
     renderEmpty("Escribe al menos un campeón para analizar el draft.");
     setStatus("Faltan campeones");
+    return;
+  }
+
+  const duplicate = findDuplicateChampion(comp);
+  if (duplicate) {
+    renderEmpty(`No repitas campeones. Corrige ${escapeHtml(duplicate)}.`);
+    setStatus("Campeón repetido");
     return;
   }
 
