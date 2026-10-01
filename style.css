@@ -85,6 +85,17 @@ h1 {
   box-shadow: var(--shadow);
   padding: 18px;
   backdrop-filter: blur(8px);
+  overflow: visible;
+}
+
+.form-card {
+  position: relative;
+  z-index: 3;
+}
+
+.result-card {
+  position: relative;
+  z-index: 1;
 }
 
 .card-head {
@@ -125,6 +136,7 @@ label span {
 
 .picker-shell {
   position: relative;
+  z-index: 4;
 }
 
 input {
@@ -153,7 +165,7 @@ input.input-error {
   left: 0;
   right: 0;
   top: calc(100% + 8px);
-  z-index: 20;
+  z-index: 9999;
   max-height: 280px;
   overflow: auto;
   padding: 6px;
