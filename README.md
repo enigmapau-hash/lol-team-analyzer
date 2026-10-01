@@ -35,6 +35,18 @@ Mini PWA para ver la pestaña **Composición** del Excel del repositorio directa
 - `npm run audit:stage1:full` → ejecuta extracción, generación y validación
 - `npm run version:sync` → sincroniza versión, changelog y metadata visible
 
+## Auditoría local
+
+Cuando trabajes con el archivo Excel en tu equipo:
+
+1. Descarga o copia `Draft Pool.xlsx` en la raíz del repo.
+2. Instala dependencias con `npm install`.
+3. Ejecuta `npm run extract:workbook` para generar `draft-pool.json`.
+4. Ejecuta `npm run generate:cases` para rellenar `tests/cases.json` con datos del workbook.
+5. Ejecuta `npm run validate:cases` para comprobar el formato.
+6. Ejecuta `npm run audit:stage1:full` para repetir todo el flujo de auditoría.
+7. Si cambias la versión visible, usa `npm run version:sync`.
+
 ## Nota
 
 La hoja Excel sigue siendo la fuente de verdad. La mini app solo la interpreta y la pinta en pantalla.
