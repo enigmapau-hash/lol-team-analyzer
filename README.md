@@ -1,23 +1,21 @@
 # LoL Team Analyzer
 
-Mini PWA para analizar composiciones de League of Legends con IA.
+Mini PWA para analizar composiciones de League of Legends con una base local.
 
 ## Uso
 
 1. Abre la app.
-2. Escribe tu OpenAI API key.
-3. Completa uno o varios roles.
-4. Pulsa **Analizar**.
+2. Escribe uno o varios roles.
+3. Pulsa **Analizar**.
 
 ## Detalles
 
-- La app pide un JSON estricto para que el análisis salga estable.
-- El análisis devuelve identidad, resumen, fortalezas, debilidades, roles que faltan, picks recomendados y condición de victoria.
-- También funciona con drafts incompletos.
+- Ya no usa IA.
+- La app está preparada para leer `draft-pool.json` como base local.
+- El objetivo es reproducir la lógica de la hoja **Composiciones** del Excel.
 - Los campos de campeón muestran autocompletado.
-- El modelo queda fijo en `gpt-4o-2024-08-06`.
-- La clave se guarda en `localStorage` del navegador.
+- Si la base local está vacía, la app avisa y muestra una salida de apoyo.
 
 ## Nota
 
-Esta versión está pensada para uso personal o pruebas rápidas.
+La hoja Excel sigue siendo la fuente de verdad; primero hay que exportar su lógica a `draft-pool.json` para que el cálculo sea equivalente.
