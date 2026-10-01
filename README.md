@@ -5,15 +5,17 @@ Mini PWA para ver la pestaña **Composición** del Excel del repositorio directa
 ## Uso
 
 1. Abre la app.
-2. Escribe uno o varios campeones.
-3. Pulsa **Analizar**.
+2. Escribe o selecciona campeones.
+3. La tabla se actualiza sola.
 
 ## Detalles
 
 - Ya no usa IA.
 - La app lee `Draft Pool.xlsx` en el navegador.
 - La salida reproduce las columnas de la hoja **Composición**.
-- Los campos de campeón muestran autocompletado.
+- Los campos de campeón tienen autocompletado.
+- No permite campeones repetidos.
+- Muestra iconos oficiales de los campeones cuando están disponibles.
 - Si el Excel no se puede leer, la app muestra un aviso claro.
 
 ## Nota
