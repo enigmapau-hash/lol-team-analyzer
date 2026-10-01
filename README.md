@@ -1,21 +1,21 @@
 # LoL Team Analyzer
 
-Mini PWA para analizar composiciones de League of Legends con una base local.
+Mini PWA para ver la pestaña **Composición** del Excel del repositorio directamente en la interfaz.
 
 ## Uso
 
 1. Abre la app.
-2. Escribe uno o varios roles.
+2. Escribe uno o varios campeones.
 3. Pulsa **Analizar**.
 
 ## Detalles
 
 - Ya no usa IA.
-- La app está preparada para leer `draft-pool.json` como base local.
-- El objetivo es reproducir la lógica de la hoja **Composiciones** del Excel.
+- La app lee `Draft Pool.xlsx` en el navegador.
+- La salida reproduce las columnas de la hoja **Composición**.
 - Los campos de campeón muestran autocompletado.
-- Si la base local está vacía, la app avisa y muestra una salida de apoyo.
+- Si el Excel no se puede leer, la app muestra un aviso claro.
 
 ## Nota
 
-La hoja Excel sigue siendo la fuente de verdad; primero hay que exportar su lógica a `draft-pool.json` para que el cálculo sea equivalente.
+La hoja Excel sigue siendo la fuente de verdad. La mini app solo la interpreta y la pinta en pantalla.
