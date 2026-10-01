@@ -23,6 +23,7 @@ const REQUIRED_ROLE_SHEETS = {
 
 const REQUIRED_ROLE_COLUMNS = ['Campeón', 'Identidad', 'Función', 'Ritmo', 'Fortalezas', 'Debilidades'];
 const COMPOSITION_SHEET = 'Composición';
+const MAX_FORMULA_SAMPLES = 20;
 
 function fail(message) {
   console.error(message);
@@ -48,6 +49,46 @@ function getSheetRowCount(sheet) {
   return XLSX.utils.sheet_to_json(sheet, { defval: '' }).length;
 }
 
+function getFormulaStats(sheet) {
+  const ref = sheet?.['!ref'];
+  if (!ref) {
+    return { formulaCount: 0, formulaRefs: [] };
+  }
+
+  const range = XLSX.utils.decode_range(ref);
+  const formulaRefs = [];
+
+  for (let row = range.s.r; row <= range.e.r; row += 1) {
+    for (let col = range.s.c; col <= range.e.c; col += 1) {
+      const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      const cell = sheet[cellAddress];
+      if (cell && typeof cell.f === 'string' && cell.f.trim()) {
+        formulaRefs.push(cellAddress);
+        if (formulaRefs.length >= MAX_FORMULA_SAMPLES) {
+          return { formulaCount: formulaRefs.length, formulaRefs };
+        }
+      }
+    }
+  }
+
+  let totalFormulaCount = formulaRefs.length;
+  if (totalFormulaCount < MAX_FORMULA_SAMPLES) {
+    // Continue counting formulas without storing every reference.
+    for (let row = range.s.r; row <= range.e.r; row += 1) {
+      for (let col = range.s.c; col <= range.e.c; col += 1) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+        if (formulaRefs.includes(cellAddress)) continue;
+        const cell = sheet[cellAddress];
+        if (cell && typeof cell.f === 'string' && cell.f.trim()) {
+          totalFormulaCount += 1;
+        }
+      }
+    }
+  }
+
+  return { formulaCount: totalFormulaCount, formulaRefs };
+}
+
 function main() {
   const inputPath = process.argv[2] || 'Draft Pool.xlsx';
   const resolvedInput = path.resolve(process.cwd(), inputPath);
@@ -62,8 +103,6 @@ function main() {
 
   const buffer = fs.readFileSync(resolvedInput);
   const workbook = XLSX.read(buffer, { type: 'buffer' });
-  const sheetNames = new Set(workbook.SheetNames);
-
   const report = {
     source: path.basename(resolvedInput),
     generatedAt: new Date().toISOString(),
@@ -86,14 +125,17 @@ function main() {
     const missingColumns = REQUIRED_ROLE_COLUMNS.filter(
       (column) => !headers.some((header) => normalize(header) === normalize(column)),
     );
-
     const rowCount = getSheetRowCount(sheet);
+    const formulas = getFormulaStats(sheet);
+
     report.sheets[roleKey] = {
       sheetName,
       ok: missingColumns.length === 0,
       rowCount,
       headers,
       missingColumns,
+      formulaCount: formulas.formulaCount,
+      formulaRefs: formulas.formulaRefs,
     };
 
     if (missingColumns.length) {
@@ -108,11 +150,14 @@ function main() {
     report.ok = false;
   } else {
     const headers = getSheetHeaders(compositionSheet);
+    const formulas = getFormulaStats(compositionSheet);
     report.sheets.composition = {
       sheetName: COMPOSITION_SHEET,
       ok: true,
       rowCount: getSheetRowCount(compositionSheet),
       headers,
+      formulaCount: formulas.formulaCount,
+      formulaRefs: formulas.formulaRefs,
     };
   }
 
