@@ -5,15 +5,16 @@ Mini PWA para ver la pestaña **Composición** del Excel del repositorio directa
 ## Uso
 
 1. Abre la app.
-2. Escribe o selecciona campeones.
+2. Elige un campeón en cada rol.
 3. La tabla se actualiza sola.
+4. Usa **Limpiar selección** para vaciar los 5 roles.
 
 ## Detalles
 
 - Ya no usa IA.
 - La app lee `Draft Pool.xlsx` en el navegador.
 - La salida reproduce las columnas de la hoja **Composición**.
-- Los campos de campeón tienen autocompletado.
+- Cada rol usa su propia lista de campeones desde su hoja del Excel.
 - No permite campeones repetidos.
 - Muestra iconos oficiales de los campeones cuando están disponibles.
 - Si el Excel no se puede leer, la app muestra un aviso claro.
