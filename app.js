@@ -5,28 +5,20 @@ const DDragonChampionDataURL = (version) =>
 const DDragonIconURL = (version, id) =>
   `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${id}.png`;
 
+const ROLE_FIELDS = [
+  { key: "top", label: "TOP", inputId: "top", menuId: "topMenu" },
+  { key: "jungle", label: "JUNGLA", inputId: "jungle", menuId: "jungleMenu" },
+  { key: "mid", label: "MID", inputId: "mid", menuId: "midMenu" },
+  { key: "botline", label: "BOTLINE", inputId: "adc", menuId: "botlineMenu" },
+  { key: "support", label: "SUPPORT", inputId: "support", menuId: "supportMenu" },
+];
+
 const SHEET_MAP = {
   top: "Tabla Top",
   jungle: "Tabla Jungla",
   mid: "Tabla Mid",
   botline: "Tabla Botline",
   support: "Tabla Support",
-};
-
-const ROLE_ORDER = [
-  { key: "top", label: "TOP" },
-  { key: "jungle", label: "JUNGLA" },
-  { key: "mid", label: "MID" },
-  { key: "botline", label: "BOTLINE" },
-  { key: "support", label: "SUPPORT" },
-];
-
-const INPUT_BY_ROLE = {
-  top: "top",
-  jungle: "jungle",
-  mid: "mid",
-  botline: "adc",
-  support: "support",
 };
 
 const DEMO = {
@@ -43,6 +35,11 @@ const els = {
   mid: document.getElementById("mid"),
   adc: document.getElementById("adc"),
   support: document.getElementById("support"),
+  topMenu: document.getElementById("topMenu"),
+  jungleMenu: document.getElementById("jungleMenu"),
+  midMenu: document.getElementById("midMenu"),
+  botlineMenu: document.getElementById("botlineMenu"),
+  supportMenu: document.getElementById("supportMenu"),
   analyzeBtn: document.getElementById("analyzeBtn"),
   demoBtn: document.getElementById("demoBtn"),
   result: document.getElementById("result"),
@@ -53,6 +50,15 @@ let draftData = null;
 let championMeta = new Map();
 let workbookReady = false;
 let analyzeQueued = false;
+let activeRoleKey = null;
+
+function roleInput(roleKey) {
+  return els[roleKey === "botline" ? "adc" : roleKey] || null;
+}
+
+function roleMenu(roleKey) {
+  return els[`${roleKey === "botline" ? "botline" : roleKey}Menu`] || null;
+}
 
 function setStatus(text) {
   els.statusPill.textContent = text;
@@ -96,10 +102,6 @@ function renderEmpty(message) {
   els.result.innerHTML = message;
 }
 
-function roleInputKey(roleKey) {
-  return INPUT_BY_ROLE[roleKey] || roleKey;
-}
-
 function getRoleRows(roleKey) {
   return draftData?.roles?.[roleKey] || [];
 }
@@ -110,18 +112,6 @@ function buildChampionList(roleKey) {
     if (row?.champion) champions.add(row.champion);
   }
   return [...champions].sort((a, b) => a.localeCompare(b, "es"));
-}
-
-function renderChampionOptions() {
-  for (const role of ROLE_ORDER) {
-    const select = els[roleInputKey(role.key)];
-    if (!select) continue;
-
-    const names = buildChampionList(role.key);
-    const placeholder = `<option value="" selected disabled>Selecciona un campeón</option>`;
-    const options = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
-    select.innerHTML = placeholder + options;
-  }
 }
 
 function getChampionMeta(name) {
@@ -149,17 +139,13 @@ function findDuplicateChampion(comp) {
 }
 
 function firstInvalidRole(comp) {
-  for (const role of ROLE_ORDER) {
-    const champ = comp[roleInputKey(role.key)];
+  for (const role of ROLE_FIELDS) {
+    const champ = comp[role.key === "botline" ? "adc" : role.key];
     if (champ && !findRoleRow(role.key, champ)) {
       return { role: role.key, champion: champ };
     }
   }
   return null;
-}
-
-function inputForRole(roleKey) {
-  return els[roleInputKey(roleKey)] || null;
 }
 
 function setInputValidity(input, isInvalid) {
@@ -169,23 +155,84 @@ function setInputValidity(input, isInvalid) {
 }
 
 function clearInputValidity() {
-  for (const input of Object.values(els)) {
-    if (input && ["INPUT", "SELECT"].includes(input.tagName)) {
-      setInputValidity(input, false);
-    }
+  for (const role of ROLE_FIELDS) {
+    setInputValidity(roleInput(role.key), false);
   }
 }
 
 function markDuplicateInputs(duplicateChampion) {
   const target = normalizeText(duplicateChampion);
-  for (const input of [els.top, els.jungle, els.mid, els.adc, els.support]) {
-    setInputValidity(input, normalizeText(input.value) === target);
+  for (const role of ROLE_FIELDS) {
+    const input = roleInput(role.key);
+    setInputValidity(input, normalizeText(input?.value) === target);
   }
 }
 
+function closeRoleMenu(roleKey) {
+  const menu = roleMenu(roleKey);
+  const input = roleInput(roleKey);
+  if (menu) menu.hidden = true;
+  if (input) input.setAttribute("aria-expanded", "false");
+  if (activeRoleKey === roleKey) activeRoleKey = null;
+}
+
+function closeAllMenus() {
+  for (const role of ROLE_FIELDS) closeRoleMenu(role.key);
+}
+
+function renderRoleMenu(roleKey, query = "") {
+  const menu = roleMenu(roleKey);
+  const input = roleInput(roleKey);
+  if (!menu || !input) return;
+
+  const allNames = buildChampionList(roleKey);
+  const normalizedQuery = normalizeText(query);
+  const filtered = normalizedQuery
+    ? allNames.filter((name) => normalizeText(name).includes(normalizedQuery))
+    : allNames;
+
+  const items = filtered.slice(0, 60);
+  menu.innerHTML = items.length
+    ? items
+        .map(
+          (name) => `
+            <button type="button" class="picker-item" data-role="${escapeHtml(roleKey)}" data-champion="${escapeHtml(name)}">
+              <span class="picker-name">${escapeHtml(name)}</span>
+            </button>
+          `
+        )
+        .join("")
+    : `<div class="picker-empty">Sin resultados</div>`;
+
+  menu.hidden = false;
+  input.setAttribute("aria-expanded", "true");
+  activeRoleKey = roleKey;
+}
+
+function renderChampionOptions() {
+  for (const role of ROLE_FIELDS) {
+    renderRoleMenu(role.key, "");
+    closeRoleMenu(role.key);
+  }
+}
+
+function openRoleMenu(roleKey) {
+  const input = roleInput(roleKey);
+  if (!input) return;
+  renderRoleMenu(roleKey, input.value);
+}
+
+function selectChampion(roleKey, championName) {
+  const input = roleInput(roleKey);
+  if (!input) return;
+  input.value = championName;
+  closeAllMenus();
+  scheduleAnalyze();
+}
+
 function renderComposition(comp) {
-  const rows = ROLE_ORDER.map((role) => {
-    const champ = comp[roleInputKey(role.key)];
+  const rows = ROLE_FIELDS.map((role) => {
+    const champ = comp[role.key === "botline" ? "adc" : role.key];
     const data = findRoleRow(role.key, champ);
     const meta = champ ? getChampionMeta(champ) : null;
     const missing = Boolean(champ) && !data;
@@ -249,6 +296,7 @@ function analyze() {
 
   if (!hasAnyChampion) {
     clearInputValidity();
+    closeAllMenus();
     renderEmpty("Selecciona un campeón en cada rol.");
     setStatus("Faltan campeones");
     return;
@@ -270,10 +318,10 @@ function analyze() {
   clearInputValidity();
   const invalidRole = firstInvalidRole(comp);
   if (invalidRole) {
-    const roleKey = invalidRole.role;
-    setInputValidity(inputForRole(roleKey), true);
+    const input = roleInput(invalidRole.role);
+    setInputValidity(input, true);
     renderComposition(comp);
-    setStatus(`No válido en ${roleKey.toUpperCase()}: ${invalidRole.champion}`);
+    setStatus(`No válido en ${invalidRole.role.toUpperCase()}: ${invalidRole.champion}`);
     return;
   }
 
@@ -299,8 +347,10 @@ function scheduleAnalyze() {
 }
 
 function clearSelection() {
-  for (const input of [els.top, els.jungle, els.mid, els.adc, els.support]) {
-    input.value = "";
+  for (const role of ROLE_FIELDS) {
+    const input = roleInput(role.key);
+    if (input) input.value = "";
+    closeRoleMenu(role.key);
   }
   clearInputValidity();
   renderEmpty("Selecciona un campeón en cada rol.");
@@ -383,17 +433,61 @@ async function loadWorkbook() {
   }
 }
 
-function bindLiveUpdates() {
-  for (const input of [els.top, els.jungle, els.mid, els.adc, els.support]) {
+function bindPickers() {
+  for (const role of ROLE_FIELDS) {
+    const input = roleInput(role.key);
+    const menu = roleMenu(role.key);
+    if (!input || !menu) continue;
+
+    input.addEventListener("focus", () => openRoleMenu(role.key));
+    input.addEventListener("click", () => openRoleMenu(role.key));
+    input.addEventListener("input", () => {
+      openRoleMenu(role.key);
+      scheduleAnalyze();
+    });
     input.addEventListener("change", scheduleAnalyze);
-    input.addEventListener("input", scheduleAnalyze);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeRoleMenu(role.key);
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const firstOption = menu.querySelector(".picker-item");
+        if (firstOption) {
+          const championName = firstOption.getAttribute("data-champion") || "";
+          if (championName) selectChampion(role.key, championName);
+        } else {
+          closeRoleMenu(role.key);
+          scheduleAnalyze();
+        }
+      }
+    });
+    input.addEventListener("blur", () => {
+      window.setTimeout(() => {
+        if (activeRoleKey === role.key) closeRoleMenu(role.key);
+      }, 120);
+    });
+
+    menu.addEventListener("mousedown", (event) => {
+      const button = event.target.closest(".picker-item");
+      if (!button) return;
+      event.preventDefault();
+      const championName = button.getAttribute("data-champion") || "";
+      if (championName) selectChampion(role.key, championName);
+    });
   }
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest(".picker-shell")) {
+      closeAllMenus();
+    }
+  });
 }
 
 els.analyzeBtn.addEventListener("click", analyze);
 els.demoBtn.addEventListener("click", clearSelection);
 
-bindLiveUpdates();
+bindPickers();
 renderNeedMoreData();
 loadChampionMeta();
 loadWorkbook();
