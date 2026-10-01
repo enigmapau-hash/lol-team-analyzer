@@ -7,6 +7,8 @@ const DEMO = {
   support: "Lulu",
 };
 
+const DEFAULT_MODEL = "gpt-4o-2024-08-06";
+
 const ANALYSIS_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -75,8 +77,9 @@ function loadSettings() {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     if (data.apiKey) els.apiKey.value = data.apiKey;
     if (data.modelName) els.modelName.value = data.modelName;
+    if (!data.modelName) els.modelName.value = DEFAULT_MODEL;
   } catch {
-    // ignore
+    els.modelName.value = DEFAULT_MODEL;
   }
 }
 
@@ -85,7 +88,7 @@ function saveSettings() {
     STORAGE_KEY,
     JSON.stringify({
       apiKey: els.apiKey.value.trim(),
-      modelName: els.modelName.value.trim() || "gpt-5.4",
+      modelName: els.modelName.value.trim() || DEFAULT_MODEL,
     })
   );
 }
@@ -166,17 +169,6 @@ function buildUserPrompt(comp) {
   return `Analiza esta composición de League of Legends:\n\nTop: ${comp.top}\nJungle: ${comp.jungle}\nMid: ${comp.mid}\nADC: ${comp.adc}\nSupport: ${comp.support}\n\nQuiero un análisis sencillo, claro y breve.`;
 }
 
-function extractText(data) {
-  const output = Array.isArray(data?.output) ? data.output : [];
-  for (const item of output) {
-    const content = Array.isArray(item?.content) ? item.content : [];
-    for (const part of content) {
-      if (typeof part?.text === "string") return part.text;
-    }
-  }
-  return "";
-}
-
 function normalizeAnalysis(raw) {
   return {
     identity: String(raw?.identity || "Sin identidad"),
@@ -184,13 +176,13 @@ function normalizeAnalysis(raw) {
     weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
     win_condition: String(raw?.win_condition || ""),
     main_threat: String(raw?.main_threat || ""),
-    difficulty: ["Easy", "Medium", "Hard"].includes(raw?.difficulty) ? raw.difficulty : "Medium",
+    difficulty: ["Easy", "Medium", "Hard"]).includes?.(raw?.difficulty) ? raw.difficulty : "Medium",
   };
 }
 
 async function analyze() {
   const apiKey = els.apiKey.value.trim();
-  const model = els.modelName.value.trim() || "gpt-5.4";
+  const model = els.modelName.value.trim() || DEFAULT_MODEL;
   const comp = readComposition();
 
   if (!apiKey) {
@@ -210,7 +202,7 @@ async function analyze() {
   renderEmpty("Analizando...");
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -218,19 +210,13 @@ async function analyze() {
       },
       body: JSON.stringify({
         model,
-        input: [
-          {
-            role: "system",
-            content: [{ type: "text", text: SYSTEM_PROMPT }],
-          },
-          {
-            role: "user",
-            content: [{ type: "text", text: buildUserPrompt(comp) }],
-          },
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: buildUserPrompt(comp) },
         ],
-        text: {
-          format: {
-            type: "json_schema",
+        response_format: {
+          type: "json_schema",
+          json_schema: {
             name: "team_analysis",
             strict: true,
             schema: ANALYSIS_SCHEMA,
@@ -246,7 +232,7 @@ async function analyze() {
       throw new Error(message);
     }
 
-    const rawText = data.output_text || extractText(data) || "";
+    const rawText = data?.choices?.[0]?.message?.content || "";
     let parsed;
 
     try {
