@@ -29,7 +29,9 @@ Mini PWA para ver la pestaña **Composición** del Excel del repositorio directa
 
 ## Comandos útiles
 
-- `npm run audit:excel` → valida directamente el Excel sin convertirlo a JSON
+- `npm run audit:excel` → valida la estructura del Excel sin convertirlo a JSON
+- `npm run audit:composition` → compara la hoja **Composición** con `tests/cases.json` directamente desde el Excel
+- `npm run audit:excel:report` → guarda el informe del workbook en `workbook-report.json`
 - `npm run version:sync` → sincroniza versión, changelog y metadata visible
 
 ## Herramientas opcionales de desarrollo
@@ -45,9 +47,10 @@ Cuando trabajes con el archivo Excel en tu equipo:
 
 1. Descarga o copia `Draft Pool.xlsx` en la raíz del repo.
 2. Instala dependencias con `npm install`.
-3. Ejecuta `npm run audit:excel` para revisar hojas, columnas y estructura directamente desde el Excel.
-4. Si necesitas utilidades de pruebas, usa los comandos opcionales de desarrollo.
-5. Si cambias la versión visible, usa `npm run version:sync`.
+3. Ejecuta `npm run audit:excel` para revisar hojas, columnas y fórmulas.
+4. Ejecuta `npm run audit:composition` para comparar la hoja **Composición** con los casos de prueba.
+5. Si necesitas utilidades de pruebas, usa los comandos opcionales de desarrollo.
+6. Si cambias la versión visible, usa `npm run version:sync`.
 
 ## Nota
 
