@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111318" />
+    <meta name="description" content="Analizador simple de composiciones de League of Legends con IA." />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <title>LoL Team Analyzer</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Rift Architect</p>
+          <h1>LoL Team Analyzer</h1>
+          <p class="subhead">Selecciona cinco campeones y la IA te devuelve una lectura breve de la composición.</p>
+        </div>
+        <div class="status-pill" id="statusPill">Listo</div>
+      </header>
+
+      <section class="card settings-card">
+        <div class="card-head">
+          <h2>IA</h2>
+          <p>Clave y modelo se guardan solo en este navegador.</p>
+        </div>
+        <div class="settings-grid">
+          <label>
+            <span>OpenAI API key</span>
+            <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
+          </label>
+          <label>
+            <span>Modelo</span>
+            <input id="modelName" type="text" value="gpt-5.4" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card form-card">
+        <div class="card-head">
+          <h2>Composición</h2>
+          <p>Escribe el campeón de cada rol.</p>
+        </div>
+
+        <div class="roles-grid">
+          <label>
+            <span>Top</span>
+            <input id="top" type="text" placeholder="Ornn" />
+          </label>
+          <label>
+            <span>Jungle</span>
+            <input id="jungle" type="text" placeholder="Vi" />
+          </label>
+          <label>
+            <span>Mid</span>
+            <input id="mid" type="text" placeholder="Ahri" />
+          </label>
+          <label>
+            <span>ADC</span>
+            <input id="adc" type="text" placeholder="Jinx" />
+          </label>
+          <label>
+            <span>Support</span>
+            <input id="support" type="text" placeholder="Lulu" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="analyzeBtn">Analizar</button>
+          <button id="demoBtn" class="secondary">Cargar ejemplo</button>
+        </div>
+      </section>
+
+      <section class="card result-card">
+        <div class="card-head">
+          <h2>Resultado</h2>
+          <p>Salida breve y directa.</p>
+        </div>
+        <div id="result" class="result-empty">
+          Aquí aparecerá el análisis.
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
