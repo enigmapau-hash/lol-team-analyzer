@@ -176,7 +176,7 @@ function normalizeAnalysis(raw) {
     weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
     win_condition: String(raw?.win_condition || ""),
     main_threat: String(raw?.main_threat || ""),
-    difficulty: ["Easy", "Medium", "Hard"]).includes?.(raw?.difficulty) ? raw.difficulty : "Medium",
+    difficulty: ["Easy", "Medium", "Hard"].includes(raw?.difficulty) ? raw.difficulty : "Medium",
   };
 }
 
