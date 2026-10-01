@@ -25,14 +25,6 @@ const SHEET_MAP = {
   support: "Tabla Support",
 };
 
-const DEMO = {
-  top: "Aatrox",
-  jungle: "Briar",
-  mid: "Anivia",
-  adc: "Draven",
-  support: "Janna",
-};
-
 const els = {
   top: document.getElementById("top"),
   jungle: document.getElementById("jungle"),
