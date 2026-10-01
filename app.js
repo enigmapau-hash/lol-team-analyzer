@@ -14,6 +14,8 @@ const ANALYSIS_SCHEMA = {
   additionalProperties: false,
   properties: {
     identity: { type: "string" },
+    playstyle: { type: "string" },
+    summary: { type: "string" },
     strengths: {
       type: "array",
       items: { type: "string" },
@@ -33,7 +35,16 @@ const ANALYSIS_SCHEMA = {
       enum: ["Easy", "Medium", "Hard"],
     },
   },
-  required: ["identity", "strengths", "weaknesses", "win_condition", "main_threat", "difficulty"],
+  required: [
+    "identity",
+    "playstyle",
+    "summary",
+    "strengths",
+    "weaknesses",
+    "win_condition",
+    "main_threat",
+    "difficulty",
+  ],
 };
 
 const els = {
@@ -57,6 +68,8 @@ Analiza una composición de 5 campeones.
 Devuelve solo JSON válido y exactamente con esta estructura:
 {
   "identity": "string",
+  "playstyle": "string",
+  "summary": "string",
   "strengths": ["string", "string", "string"],
   "weaknesses": ["string", "string", "string"],
   "win_condition": "string",
@@ -67,10 +80,13 @@ Devuelve solo JSON válido y exactamente con esta estructura:
 Reglas:
 - Máximo 3 puntos por lista.
 - Frases cortas.
+- summary: una sola frase muy clara, máximo 18 palabras.
+- playstyle: una etiqueta breve, por ejemplo "Front to Back", "Pick", "Dive", "Poke" o "Skirmish".
+- win_condition: una frase práctica y concreta.
 - Sin markdown.
 - Sin explicaciones.
 - Sin campos extra.
-- Si no estás seguro, prioriza una lectura útil para draft y teamfights.`;
+- Prioriza teamfights, sinergias, curva de poder y condición de victoria.`;
 
 function loadSettings() {
   try {
@@ -129,28 +145,40 @@ function renderAnalysis(data) {
   els.result.innerHTML = `
     <div class="badge-row">
       <span class="badge">${escapeHtml(data.identity || "Sin identidad")}</span>
-      <span class="badge warn">Dificultad: ${escapeHtml(data.difficulty || "Medium")}</span>
+      <span class="badge warn">${escapeHtml(data.playstyle || "Playstyle")}</span>
+      <span class="badge red">Dificultad: ${escapeHtml(data.difficulty || "Medium")}</span>
     </div>
 
     <div class="result-grid">
+      <div class="metric">
+        <span class="label">Resumen</span>
+        <div class="value">${escapeHtml(data.summary || "-")}</div>
+      </div>
       <div class="metric">
         <span class="label">Condición de victoria</span>
         <div class="value">${escapeHtml(data.win_condition || "-")}</div>
       </div>
+    </div>
+
+    <div class="result-grid">
       <div class="metric">
         <span class="label">Amenaza principal</span>
         <div class="value">${escapeHtml(data.main_threat || "-")}</div>
+      </div>
+      <div class="metric">
+        <span class="label">Fortalezas</span>
+        ${renderList(data.strengths)}
       </div>
     </div>
 
     <div class="result-grid">
       <div class="metric">
-        <span class="label">Fortalezas</span>
-        ${renderList(data.strengths)}
-      </div>
-      <div class="metric">
         <span class="label">Debilidades</span>
         ${renderList(data.weaknesses)}
+      </div>
+      <div class="metric">
+        <span class="label">Lectura rápida</span>
+        <div class="value">${escapeHtml(data.playstyle || "-")}</div>
       </div>
     </div>
   `;
@@ -166,12 +194,14 @@ function escapeHtml(value) {
 }
 
 function buildUserPrompt(comp) {
-  return `Analiza esta composición de League of Legends:\n\nTop: ${comp.top}\nJungle: ${comp.jungle}\nMid: ${comp.mid}\nADC: ${comp.adc}\nSupport: ${comp.support}\n\nQuiero un análisis sencillo, claro y breve.`;
+  return `Analiza esta composición de League of Legends:\n\nTop: ${comp.top}\nJungle: ${comp.jungle}\nMid: ${comp.mid}\nADC: ${comp.adc}\nSupport: ${comp.support}\n\nQuiero una lectura sencilla, clara y muy breve.`;
 }
 
 function normalizeAnalysis(raw) {
   return {
     identity: String(raw?.identity || "Sin identidad"),
+    playstyle: String(raw?.playstyle || ""),
+    summary: String(raw?.summary || ""),
     strengths: Array.isArray(raw?.strengths) ? raw.strengths.slice(0, 3).map(String) : [],
     weaknesses: Array.isArray(raw?.weaknesses) ? raw.weaknesses.slice(0, 3).map(String) : [],
     win_condition: String(raw?.win_condition || ""),
@@ -240,7 +270,9 @@ async function analyze() {
     } catch {
       parsed = {
         identity: "Respuesta no estructurada",
-        strengths: [rawText || "No se pudo leer la respuesta."],
+        playstyle: "",
+        summary: rawText || "No se pudo leer la respuesta.",
+        strengths: [],
         weaknesses: [],
         win_condition: "",
         main_threat: "",
