@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#111318" />
-    <meta name="description" content="Analizador simple de composiciones de League of Legends con IA." />
+    <meta name="description" content="Mini app de composiciones de League of Legends basada en datos locales." />
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="style.css" />
@@ -16,28 +16,15 @@
         <div>
           <p class="eyebrow">Rift Architect</p>
           <h1>LoL Team Analyzer</h1>
-          <p class="subhead">Escribe campeones y la IA te devuelve una lectura breve del draft, incluso si está incompleto.</p>
+          <p class="subhead">La app reproduce la lógica de la hoja Composiciones usando la base local del draft.</p>
         </div>
         <div class="status-pill" id="statusPill">Listo</div>
       </header>
 
-      <section class="card settings-card">
-        <div class="card-head">
-          <h2>IA</h2>
-          <p>Clave local, solo para pruebas.</p>
-        </div>
-        <div class="settings-grid">
-          <label>
-            <span>OpenAI API key</span>
-            <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
-          </label>
-        </div>
-      </section>
-
       <section class="card form-card">
         <div class="card-head">
           <h2>Composición</h2>
-          <p>Rellena los roles que tengas y analiza.</p>
+          <p>Rellena los roles y analiza.</p>
         </div>
 
         <div class="roles-grid">
