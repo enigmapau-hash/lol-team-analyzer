@@ -302,14 +302,13 @@ function scheduleAnalyze() {
   });
 }
 
-function fillDemo() {
-  els.top.value = DEMO.top;
-  els.jungle.value = DEMO.jungle;
-  els.mid.value = DEMO.mid;
-  els.adc.value = DEMO.adc;
-  els.support.value = DEMO.support;
-  setStatus("Ejemplo cargado");
-  scheduleAnalyze();
+function clearSelection() {
+  for (const input of [els.top, els.jungle, els.mid, els.adc, els.support]) {
+    input.value = "";
+  }
+  clearInputValidity();
+  renderEmpty("Selecciona un campeón en cada rol.");
+  setStatus("Selección limpia");
 }
 
 async function loadChampionMeta() {
@@ -397,7 +396,7 @@ function bindLiveUpdates() {
 }
 
 els.analyzeBtn.addEventListener("click", analyze);
-els.demoBtn.addEventListener("click", fillDemo);
+els.demoBtn.addEventListener("click", clearSelection);
 
 bindLiveUpdates();
 renderNeedMoreData();
