@@ -12,7 +12,7 @@ Mini PWA para analizar composiciones de League of Legends con IA.
 ## Detalles
 
 - La app pide un JSON estricto para que el análisis salga estable.
-- El análisis devuelve identidad, playstyle, resumen, fortalezas, debilidades, roles que faltan, picks recomendados, condición de victoria, amenaza principal y dificultad.
+- El análisis devuelve identidad, resumen, fortalezas, debilidades, roles que faltan, picks recomendados y condición de victoria.
 - También funciona con drafts incompletos.
 - Los campos de campeón muestran autocompletado.
 - El modelo queda fijo en `gpt-4o-2024-08-06`.
