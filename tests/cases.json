@@ -1,0 +1,44 @@
+[
+  {
+    "name": "composition-front-to-back",
+    "composition": {
+      "top": "Ornn",
+      "jungle": "Vi",
+      "mid": "Ahri",
+      "adc": "Jinx",
+      "support": "Lulu"
+    },
+    "expected": {
+      "status": "pending"
+    },
+    "notes": "Completar con el resultado exacto del Excel."
+  },
+  {
+    "name": "composition-pick",
+    "composition": {
+      "top": "K'Sante",
+      "jungle": "Viego",
+      "mid": "Taliyah",
+      "adc": "Kai'Sa",
+      "support": "Nautilus"
+    },
+    "expected": {
+      "status": "pending"
+    },
+    "notes": "Caso orientado a pick y pelea corta."
+  },
+  {
+    "name": "composition-poke",
+    "composition": {
+      "top": "Jayce",
+      "jungle": "Nidalee",
+      "mid": "Xerath",
+      "adc": "Varus",
+      "support": "Zyra"
+    },
+    "expected": {
+      "status": "pending"
+    },
+    "notes": "Caso orientado a poke / siege."
+  }
+]
