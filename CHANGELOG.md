@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.1
+
+### Added
+- Búsqueda inteligente en el selector.
+- Coincidencias por parte del nombre.
+- Acrónimos como MF, KOG o LEE.
+- Ordenación mejorada de resultados.
+
+### Notes
+- Se mantiene la base estable y el selector sin duplicados.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.0
 
 ### Added
