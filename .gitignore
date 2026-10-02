@@ -147,5 +147,3 @@ stage1-audit.json
 workbook-report.json
 composition-audit.json
 draft-pool.json
-tests/composition.validation.json
-composition-validation-report.json
