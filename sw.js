@@ -1,5 +1,22 @@
-const CACHE_NAME = "lol-team-analyzer-v1";
-const ASSETS = ["./", "./index.html", "./style.css", "./app.js", "./manifest.json", "./icon.svg"];
+const CACHE_NAME = "lol-team-analyzer-v2";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./manifest.json",
+  "./icon.svg",
+  "./version.json",
+  "./version.js",
+  "./realtime-mode.js",
+  "./no-duplicate-options.js",
+  "./selected-preview.js",
+  "./menu-icons.js",
+  "./stage3-spacing.css",
+  "./stage3-visual.css",
+  "./stage3-animations.css",
+  "./Draft Pool.xlsx",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -17,6 +34,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  event.respondEvent?();
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => caches.match("./index.html")))
   );
