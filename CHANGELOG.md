@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.4
+
+### Added
+- Sinergia global encima del resultado.
+- Identidades resumidas por frecuencia.
+- Funciones resumidas por frecuencia.
+- Fortalezas y debilidades destacadas.
+
+### Notes
+- El resumen visual queda más orientado a lectura rápida.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.3
 
 ### Added
