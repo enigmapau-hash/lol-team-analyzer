@@ -143,7 +143,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Generated audit artifacts
-stage1-audit.json
 workbook-report.json
-composition-audit.json
-draft-pool.json
+composition-validation-report.json
+tests/composition.validation.json
