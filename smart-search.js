@@ -1,18 +1,10 @@
 (() => {
-  const baseNormalize =
-    typeof normalizeText === "function"
-      ? normalizeText
-      : (value) =>
-          String(value || "")
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/["'`´’]/g, "")
-            .trim()
-            .toLowerCase();
+  const normalizeText = window.normalizeText;
+  if (typeof normalizeText !== "function") return;
 
-  const compact = (value) => baseNormalize(value).replace(/[^a-z0-9]/g, "");
+  const compact = (value) => normalizeText(value).replace(/[^a-z0-9]/g, "");
   const acronym = (value) =>
-    baseNormalize(value)
+    normalizeText(value)
       .split(/\s+/)
       .filter(Boolean)
       .map((part) => part[0])
@@ -55,7 +47,7 @@
     if (!menu || !input) return;
 
     const allNames = draftData ? buildChampionList(roleKey) : [];
-    const normalizedQuery = baseNormalize(query);
+    const normalizedQuery = normalizeText(query);
 
     const ranked = normalizedQuery
       ? allNames
@@ -76,10 +68,10 @@
                 class="picker-item${index === 0 ? " is-active" : ""}"
                 role="option"
                 aria-selected="${index === 0 ? "true" : "false"}"
-                data-role="${escapeHtml(roleKey)}"
-                data-champion="${escapeHtml(item.name)}"
+                data-role="${item.role || roleKey}"
+                data-champion="${item.name}"
               >
-                <span class="picker-name">${escapeHtml(item.name)}</span>
+                <span class="picker-name">${item.name}</span>
               </button>
             `;
           })
