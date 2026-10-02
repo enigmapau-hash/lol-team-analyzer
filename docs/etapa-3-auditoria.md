@@ -10,6 +10,13 @@ Pulir diseño y experiencia de usuario sin tocar la lógica de la miniapp.
 - `version.js` sigue cargando `version.json`.
 - `index.html` ya enlaza las tres capas visuales.
 
+## Estado del despliegue
+- [ ] GitHub Pages sirve el último commit publicado.
+- [ ] No aparecen 404 en `stage3-spacing.css`.
+- [ ] No aparecen 404 en `stage3-visual.css`.
+- [ ] No aparecen 404 en `stage3-animations.css`.
+- [ ] No aparecen 404 en `version.js`.
+
 ## Checklist de espaciados y alineación
 - [x] Encabezado con ritmo visual correcto.
 - [x] Tarjetas con márgenes coherentes.
