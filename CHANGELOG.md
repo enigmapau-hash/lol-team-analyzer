@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.3
+
+### Added
+- Identidad en la vista rápida.
+- Función en la vista rápida.
+- Resumen rápido más completo sobre la tabla.
+
+### Notes
+- La vista rápida gana contexto sin tocar la lógica del Excel.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.2
 
 ### Added
