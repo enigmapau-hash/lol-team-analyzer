@@ -4,16 +4,16 @@
   if (!badge || !panel) return;
 
   const fallback = {
-    version: "v1.0.0",
-    track: "Lanzamiento estable",
-    label: "Stable",
+    version: "v1.1.0",
+    track: "Evolución de UX",
+    label: "Preview",
     updated: "2026-10-02",
     summary: [
-      "Selector unificado y estable",
-      "Lectura directa del Excel",
-      "Reproducción de la pestaña Composición",
-      "Responsive para móvil, tablet y escritorio",
-      "Sin IA ni pasos intermedios",
+      "Selector compacto con iconos",
+      "Campeones duplicados ocultos",
+      "Análisis en tiempo real",
+      "Despliegue y caché corregidos",
+      "Base estable mantenida",
     ],
     pending: [],
   };
