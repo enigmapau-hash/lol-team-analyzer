@@ -14,14 +14,24 @@
    - `Tabla Support`
 3. El selector de campeón muestra únicamente los campeones válidos de su rol.
 4. La vista de resultado reproduce la hoja `Composición`.
-5. El badge de versión y el panel de revisión leen `version.json`.
+5. La vista rápida resume identidad, función y ritmo.
+6. El badge de versión y el panel de revisión leen `version.json`.
 
 ## Componentes
 - `app.js`: motor de lectura del Excel, composición y render de resultados.
-- `picker-overlay.js`: capa de overlay del selector para móvil y escritorio.
+- `shared-utils.js`: utilidades comunes de texto.
+- `smart-search.js`: búsqueda inteligente del selector.
+- `no-duplicate-options.js`: ocultación de campeones ya seleccionados.
+- `selected-preview.js`: preview del campeón elegido dentro del input.
+- `menu-icons.js`: iconos en el desplegable.
+- `realtime-mode.js`: análisis automático al cambiar la composición.
+- `result-summary.js`: vista rápida y sinergia global.
+- `result-summary.css`: estilos del resumen rápido.
+- `stage3-spacing.css`: espaciado y layout.
+- `stage3-visual.css`: acabado visual principal.
+- `stage3-animations.css`: microanimaciones.
 - `version.js`: badge de versión y panel de revisión.
-- `style.css`: interfaz principal.
-- `version.css`: badge y panel de versión.
+- `style.css`: base visual general.
 
 ## Reglas base
 - No se permiten campeones repetidos.
