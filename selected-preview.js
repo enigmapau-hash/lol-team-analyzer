@@ -1,4 +1,7 @@
 (() => {
+  const normalizeText = window.normalizeText;
+  if (typeof normalizeText !== "function") return;
+
   const roles = [
     { key: "top", inputId: "top" },
     { key: "jungle", inputId: "jungle" },
@@ -16,14 +19,6 @@
   const championMeta = new Map();
   let refreshQueued = false;
 
-  const normalize = (value) =>
-    String(value || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[\"'`´’]/g, "")
-      .trim()
-      .toLowerCase();
-
   const getInput = (role) => document.getElementById(role.inputId);
 
   function renderRole(role) {
@@ -31,7 +26,7 @@
     if (!input) return;
 
     const rawValue = input.value.trim();
-    const meta = championMeta.get(normalize(rawValue)) || null;
+    const meta = championMeta.get(normalizeText(rawValue)) || null;
 
     if (!rawValue || !meta?.iconUrl) {
       input.classList.remove("has-selected-champion");
@@ -76,7 +71,7 @@
         const name = String(champ?.name || "").trim();
         const id = String(champ?.id || "").trim();
         if (!name || !id) continue;
-        championMeta.set(normalize(name), {
+        championMeta.set(normalizeText(name), {
           name,
           id,
           iconUrl: DDragonIconURL(version, id),
