@@ -1,5 +1,5 @@
 (() => {
-  const normalizeText = window.normalizeText;
+  const normalizeText = window.LTAUtils?.normalizeText;
   if (typeof normalizeText !== "function") return;
 
   const compact = (value) => normalizeText(value).replace(/[^a-z0-9]/g, "");
@@ -68,7 +68,6 @@
                 class="picker-item${index === 0 ? " is-active" : ""}"
                 role="option"
                 aria-selected="${index === 0 ? "true" : "false"}"
-                data-role="${item.role || roleKey}"
                 data-champion="${item.name}"
               >
                 <span class="picker-name">${item.name}</span>
