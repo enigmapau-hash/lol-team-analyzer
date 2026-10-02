@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.5
+
+### Added
+- Sinergia global plegable por defecto.
+- Menos ruido visual en el resultado cuando la composición ya está completa.
+- Lectura rápida más clara sin perder el detalle.
+
+### Notes
+- La auditoría UX reduce distracciones y mantiene el contexto accesible.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.4
 
 ### Added
