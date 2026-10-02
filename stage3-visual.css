@@ -124,6 +124,32 @@ input:not(:placeholder-shown) {
 
 .picker-item {
   color: #f4f6f8;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.picker-item__icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.picker-item__icon.placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #d8e0eb;
+}
+
+.picker-item__label {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .picker-item:hover,
@@ -253,5 +279,10 @@ button.secondary {
   .selected-champion__icon {
     width: 24px;
     height: 24px;
+  }
+
+  .picker-item__icon {
+    width: 20px;
+    height: 20px;
   }
 }
