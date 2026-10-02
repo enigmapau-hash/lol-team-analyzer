@@ -8,8 +8,7 @@
 
   function clearSummary() {
     delete result.dataset.summarySignature;
-    const existing = result.querySelector(".result-summary");
-    if (existing) existing.remove();
+    result.querySelector(".result-summary")?.remove();
   }
 
   function splitList(value) {
@@ -20,9 +19,7 @@
   }
 
   function normalizeLabel(value) {
-    return String(value || "")
-      .trim()
-      .replace(/\s+/g, " ");
+    return String(value || "").trim().replace(/\s+/g, " ");
   }
 
   function topCounts(map, limit = 3) {
@@ -56,7 +53,6 @@
       const missing = row.classList.contains("is-missing");
       const unknown = row.classList.contains("is-unknown");
       const icon = row.querySelector(".champion-icon")?.outerHTML || "";
-
       return { role, champion, identity, functionLabel, tempo, strengths, weaknesses, missing, unknown, icon };
     });
 
@@ -67,8 +63,7 @@
     if (result.dataset.summarySignature === signature) return;
     result.dataset.summarySignature = signature;
 
-    const previous = result.querySelector(".result-summary");
-    if (previous) previous.remove();
+    result.querySelector(".result-summary")?.remove();
 
     const completed = items.filter((item) => item.champion && item.champion !== "—" && !item.missing).length;
     const problems = items.filter((item) => item.missing || item.unknown || !item.champion || item.champion === "—").length;
@@ -113,6 +108,7 @@
     const tempoTop = topCounts(tempoCounts, 2);
     const strengthTop = topCounts(strengthCounts, 2);
     const weaknessTop = topCounts(weaknessCounts, 2);
+    const globalPreview = [identityTop[0]?.label, functionTop[0]?.label, tempoTop[0]?.label].filter(Boolean).join(" · ");
 
     const summary = document.createElement("section");
     summary.className = `result-summary${ready ? " is-ready" : " is-pending"}`;
@@ -135,32 +131,35 @@
         </div>
       </div>
 
-      <div class="result-summary__global ${ready ? "is-ready" : "is-pending"}">
-        <div class="result-summary__global-head">
+      <details class="result-summary__global ${ready ? "is-ready" : "is-pending"}"${ready ? "" : " open"}>
+        <summary class="result-summary__global-summary">
           <div>
             <p class="result-summary__eyebrow">Sinergia global</p>
-            <h4>${ready ? "Lectura del equipo" : "Lectura parcial"}</h4>
+            <h4>${ready ? "Resumen compacto" : "Ayuda para completar"}</h4>
+            <p class="result-summary__global-note">${globalPreview || "Lectura compacta de identidades, funciones y ritmo."}</p>
           </div>
-          <p class="result-summary__global-note">Basado en las identidades, funciones, ritmo y etiquetas del Excel.</p>
-        </div>
+          <span class="result-summary__global-toggle">${ready ? "Ver detalle" : "Ocultar ayuda"}</span>
+        </summary>
 
-        <div class="result-summary__chip-row">
-          ${identityTop.length ? identityTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin identidad</span>`}
-          ${functionTop.length ? functionTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin función</span>`}
-          ${tempoTop.length ? tempoTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin ritmo</span>`}
-        </div>
+        <div class="result-summary__global-body">
+          <div class="result-summary__chip-row">
+            ${identityTop.length ? identityTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin identidad</span>`}
+            ${functionTop.length ? functionTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin función</span>`}
+            ${tempoTop.length ? tempoTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin ritmo</span>`}
+          </div>
 
-        <div class="result-summary__mini-grid">
-          <div class="result-summary__mini-card">
-            <span>Fortalezas destacadas</span>
-            <strong>${strengthTop.length ? strengthTop.map((item) => item.label).join(" · ") : ready ? "Sin datos" : "Pendiente"}</strong>
-          </div>
-          <div class="result-summary__mini-card">
-            <span>Debilidades visibles</span>
-            <strong>${weaknessTop.length ? weaknessTop.map((item) => item.label).join(" · ") : ready ? "Sin datos" : "Pendiente"}</strong>
+          <div class="result-summary__mini-grid">
+            <div class="result-summary__mini-card">
+              <span>Fortalezas destacadas</span>
+              <strong>${strengthTop.length ? strengthTop.map((item) => item.label).join(" · ") : ready ? "Sin datos" : "Pendiente"}</strong>
+            </div>
+            <div class="result-summary__mini-card">
+              <span>Debilidades visibles</span>
+              <strong>${weaknessTop.length ? weaknessTop.map((item) => item.label).join(" · ") : ready ? "Sin datos" : "Pendiente"}</strong>
+            </div>
           </div>
         </div>
-      </div>
+      </details>
 
       <div class="result-summary__roles">
         ${items
@@ -170,7 +169,6 @@
             const identity = item.identity || (ready ? "Listo" : "Pendiente");
             const functionLabel = item.functionLabel || (ready ? "Listo" : "Pendiente");
             const icon = item.icon || `<span class="result-summary__icon placeholder" aria-hidden="true">${champion.slice(0, 2).toUpperCase()}</span>`;
-
             return `
               <article class="result-summary__role ${status}">
                 <div class="result-summary__role-icon">${icon}</div>
