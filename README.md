@@ -28,23 +28,24 @@ Mini PWA para reproducir la pestaña **Composición** del Excel del repositorio 
 
 ## Validación contra el Excel
 
-La validación exacta ya está montada para comprobar casos generados desde el propio workbook:
+La validación exacta ya está montada para comprobar 30 casos generados desde el propio workbook:
 
-- `npm run generate:composition-cases` → genera 30 casos exactos desde `Draft Pool.xlsx`
-- `npm run validate:composition-cases` → compara esos casos contra el Excel
+- `npm run generate:composition-cases` → genera `tests/composition.validation.json`
+- `npm run validate:composition-cases` → compara esos casos contra el Excel y escribe `composition-validation-report.json`
 - `npm run audit:composition` → genera y valida en un solo paso
-- `npm run audit:all` → ejecuta la validación exacta y luego revisa los assets públicos
+- `npm run audit:all` → ejecuta la validación exacta, escribe `workbook-report.json` y revisa los assets públicos
 
 ## Comandos útiles
 
-- `npm run audit:excel` → valida la estructura del Excel sin convertirlo a JSON
-- `npm run audit:composition` → genera 30 casos exactos desde el Excel y los valida
-- `npm run audit:all` → ejecuta la validación exacta y la revisión de assets públicos
+- `npm run audit:excel` → valida la estructura del Excel y escribe `workbook-report.json`
+- `npm run audit:composition` → genera 30 casos exactos desde el Excel y escribe `composition-validation-report.json`
+- `npm run audit:all` → ejecuta la validación exacta, escribe ambos reportes y revisa los assets públicos
 - `npm run version:sync` → sincroniza versión, changelog y metadata visible
 
 ## CI / GitHub Actions
 
 - El workflow `Stage 1 Audit` ejecuta `npm run audit:all` en cada push y pull request sobre `main`.
+- Los artefactos del workflow incluyen `workbook-report.json`, `composition-validation-report.json` y `tests/composition.validation.json`.
 
 ## Nota
 
