@@ -1,4 +1,9 @@
 (() => {
+  const utils = window.LTAUtils || {};
+  const normalizeText = utils.normalizeText;
+  const escapeHtml = utils.escapeHtml;
+  if (typeof normalizeText !== "function" || typeof escapeHtml !== "function") return;
+
   const DDragonVersionsURL = "https://ddragon.leagueoflegends.com/api/versions.json";
   const DDragonChampionDataURL = (version) =>
     `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`;
@@ -8,24 +13,8 @@
   const championMeta = new Map();
   let refreshQueued = false;
 
-  const normalize = (value) =>
-    String(value || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[\"'`´’]/g, "")
-      .trim()
-      .toLowerCase();
-
-  const escapeHtml = (value) =>
-    String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-
   function getMeta(championName) {
-    return championMeta.get(normalize(championName)) || null;
+    return championMeta.get(normalizeText(championName)) || null;
   }
 
   function decorateItem(item) {
@@ -85,7 +74,7 @@
         const name = String(champ?.name || "").trim();
         const id = String(champ?.id || "").trim();
         if (!name || !id) continue;
-        championMeta.set(normalize(name), {
+        championMeta.set(normalizeText(name), {
           name,
           id,
           iconUrl: DDragonIconURL(version, id),
