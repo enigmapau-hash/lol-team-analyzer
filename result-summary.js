@@ -2,7 +2,7 @@
   const result = document.getElementById("result");
   if (!result) return;
 
-  const splitList = window.splitList;
+  const splitList = window.LTAUtils?.splitList;
   if (typeof splitList !== "function") return;
 
   let refreshQueued = false;
