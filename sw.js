@@ -1,4 +1,4 @@
-const CACHE_NAME = "lol-team-analyzer-v5";
+const CACHE_NAME = "lol-team-analyzer-v6";
 const ASSETS = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const ASSETS = [
   "./menu-icons.js",
   "./result-summary.js",
   "./result-summary.css",
+  "./result-summary-global.css",
   "./stage3-spacing.css",
   "./stage3-visual.css",
   "./stage3-animations.css",
