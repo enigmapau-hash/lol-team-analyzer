@@ -25,11 +25,14 @@ jobs:
         run: npm ci
 
       - name: Run consolidated audit
-        run: npm run audit:all > stage1-audit.json
+        run: npm run audit:all
 
-      - name: Upload audit report
+      - name: Upload audit reports
         uses: actions/upload-artifact@v4
         with:
-          name: stage1-audit-report
-          path: stage1-audit.json
+          name: stage1-audit-reports
+          path: |
+            workbook-report.json
+            composition-validation-report.json
+            tests/composition.validation.json
           if-no-files-found: error
