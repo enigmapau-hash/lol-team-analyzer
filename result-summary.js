@@ -12,6 +12,26 @@
     if (existing) existing.remove();
   }
 
+  function splitList(value) {
+    return String(value || "")
+      .split(/[;,·\n]/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+  }
+
+  function normalizeLabel(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  function topCounts(map, limit = 3) {
+    return [...map.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es"))
+      .slice(0, limit)
+      .map(([label, count]) => ({ label, count }));
+  }
+
   function buildSummary() {
     const table = result.querySelector(".composition-table");
     if (!table) {
@@ -31,15 +51,17 @@
       const identity = text(row.querySelector('[data-label="Identidad"]'));
       const functionLabel = text(row.querySelector('[data-label="Función"]'));
       const tempo = text(row.querySelector('[data-label="Ritmo"]'));
+      const strengths = text(row.querySelector('[data-label="Fortalezas"]'));
+      const weaknesses = text(row.querySelector('[data-label="Debilidades"]'));
       const missing = row.classList.contains("is-missing");
       const unknown = row.classList.contains("is-unknown");
       const icon = row.querySelector(".champion-icon")?.outerHTML || "";
 
-      return { role, champion, identity, functionLabel, tempo, missing, unknown, icon };
+      return { role, champion, identity, functionLabel, tempo, strengths, weaknesses, missing, unknown, icon };
     });
 
     const signature = items
-      .map((item) => [item.role, item.champion, item.identity, item.functionLabel, item.tempo, item.missing, item.unknown].join("|"))
+      .map((item) => [item.role, item.champion, item.identity, item.functionLabel, item.tempo, item.strengths, item.weaknesses, item.missing, item.unknown].join("|"))
       .join(";");
 
     if (result.dataset.summarySignature === signature) return;
@@ -51,6 +73,46 @@
     const completed = items.filter((item) => item.champion && item.champion !== "—" && !item.missing).length;
     const problems = items.filter((item) => item.missing || item.unknown || !item.champion || item.champion === "—").length;
     const ready = problems === 0;
+
+    const identityCounts = new Map();
+    const functionCounts = new Map();
+    const tempoCounts = new Map();
+    const strengthCounts = new Map();
+    const weaknessCounts = new Map();
+
+    for (const item of items) {
+      for (const label of splitList(item.identity)) {
+        const key = normalizeLabel(label);
+        if (!key) continue;
+        identityCounts.set(key, (identityCounts.get(key) || 0) + 1);
+      }
+      for (const label of splitList(item.functionLabel)) {
+        const key = normalizeLabel(label);
+        if (!key) continue;
+        functionCounts.set(key, (functionCounts.get(key) || 0) + 1);
+      }
+      for (const label of splitList(item.tempo)) {
+        const key = normalizeLabel(label);
+        if (!key) continue;
+        tempoCounts.set(key, (tempoCounts.get(key) || 0) + 1);
+      }
+      for (const label of splitList(item.strengths)) {
+        const key = normalizeLabel(label);
+        if (!key) continue;
+        strengthCounts.set(key, (strengthCounts.get(key) || 0) + 1);
+      }
+      for (const label of splitList(item.weaknesses)) {
+        const key = normalizeLabel(label);
+        if (!key) continue;
+        weaknessCounts.set(key, (weaknessCounts.get(key) || 0) + 1);
+      }
+    }
+
+    const identityTop = topCounts(identityCounts, 2);
+    const functionTop = topCounts(functionCounts, 2);
+    const tempoTop = topCounts(tempoCounts, 2);
+    const strengthTop = topCounts(strengthCounts, 2);
+    const weaknessTop = topCounts(weaknessCounts, 2);
 
     const summary = document.createElement("section");
     summary.className = `result-summary${ready ? " is-ready" : " is-pending"}`;
@@ -72,6 +134,34 @@
           </span>
         </div>
       </div>
+
+      <div class="result-summary__global ${ready ? "is-ready" : "is-pending"}">
+        <div class="result-summary__global-head">
+          <div>
+            <p class="result-summary__eyebrow">Sinergia global</p>
+            <h4>${ready ? "Lectura del equipo" : "Lectura parcial"}</h4>
+          </div>
+          <p class="result-summary__global-note">Basado en las identidades, funciones, ritmo y etiquetas del Excel.</p>
+        </div>
+
+        <div class="result-summary__chip-row">
+          ${identityTop.length ? identityTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin identidad</span>`}
+          ${functionTop.length ? functionTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin función</span>`}
+          ${tempoTop.length ? tempoTop.map((item) => `<span class="result-summary__chip"><strong>${item.label}</strong><small>${item.count}</small></span>`).join("") : `<span class="result-summary__chip is-empty">Sin ritmo</span>`}
+        </div>
+
+        <div class="result-summary__mini-grid">
+          <div class="result-summary__mini-card">
+            <span>Fortalezas destacadas</span>
+            <strong>${strengthTop.length ? strengthTop.map((item) => item.label).join(" · ") : ready ? "Sin datos" : "Pendiente"}</strong>
+          </div>
+          <div class="result-summary__mini-card">
+            <span>Debilidades visibles</span>
+            <strong>${weaknessTop.length ? weaknessTop.map((item) => item.label).join(" · ") : ready ? "Sin datos" : "Pendiente"}</strong>
+          </div>
+        </div>
+      </div>
+
       <div class="result-summary__roles">
         ${items
           .map((item) => {
