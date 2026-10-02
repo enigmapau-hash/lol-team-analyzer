@@ -2,6 +2,9 @@
   const result = document.getElementById("result");
   if (!result) return;
 
+  const splitList = window.splitList;
+  if (typeof splitList !== "function") return;
+
   let refreshQueued = false;
 
   const text = (node) => node?.textContent?.trim() || "";
@@ -9,13 +12,6 @@
   function clearSummary() {
     delete result.dataset.summarySignature;
     result.querySelector(".result-summary")?.remove();
-  }
-
-  function splitList(value) {
-    return String(value || "")
-      .split(/[;,·\n]/)
-      .map((part) => part.trim())
-      .filter(Boolean);
   }
 
   function normalizeLabel(value) {
