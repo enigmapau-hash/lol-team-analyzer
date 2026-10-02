@@ -1,46 +1,18 @@
-# Tests y auditoría
+# Validación del Excel
 
-Este directorio recoge casos de referencia para comparar la hoja **Composición** del Excel con la mini app.
+Este directorio se reserva para los archivos generados por la validación exacta contra `Draft Pool.xlsx`.
 
-## Objetivo
+## Archivos generados
 
-Verificar que, para una selección concreta de campeones, la app devuelve el mismo resultado que el Excel.
-
-## Formato recomendado de caso
-
-Cada caso debería incluir:
-
-- `name`: nombre corto del caso.
-- `composition`: campeones seleccionados por rol.
-- `expected`: resultado esperado según el Excel.
-- `notes`: observaciones de revisión.
-
-## Ejemplo
-
-```json
-{
-  "name": "composition-front-to-back",
-  "composition": {
-    "top": "Ornn",
-    "jungle": "Vi",
-    "mid": "Ahri",
-    "adc": "Jinx",
-    "support": "Lulu"
-  },
-  "expected": {
-    "status": "pending"
-  },
-  "notes": "Completar con el resultado exacto del Excel."
-}
-```
+- `tests/composition.validation.json`: casos de prueba generados desde el workbook.
+- `composition-validation-report.json`: informe de comparación contra la hoja **Composición**.
 
 ## Uso
 
-1. Tomar una composición del Excel.
-2. Volcar el resultado exacto a un JSON.
-3. Comprobar que la mini app reproduce el mismo valor.
-4. Marcar el caso como validado.
+1. Ejecuta `npm run generate:composition-cases`.
+2. Ejecuta `npm run validate:composition-cases`.
+3. Revisa el informe generado.
 
-## Criterio de cierre de la etapa
+## Nota
 
-La etapa se considera cerrada cuando exista un conjunto mínimo de casos reales validados y la app reproduzca los resultados del Excel sin diferencias.
+El objetivo es conservar un punto claro para la validación del Excel sin mezclar documentación antigua ni casos obsoletos.
