@@ -1,13 +1,13 @@
 {
-  "version": "v1.1.4",
-  "track": "Sinergia global",
+  "version": "v1.1.5",
+  "track": "Auditoría UX",
   "label": "Preview",
   "updated": "2026-10-02",
   "summary": [
-    "Sinergia global encima del resultado",
-    "Identidades resumidas por frecuencia",
-    "Funciones resumidas por frecuencia",
-    "Fortalezas y debilidades destacadas",
+    "Sinergia global plegable por defecto",
+    "Menos ruido visual en el resultado",
+    "Lectura rápida más clara",
+    "Detalles manteniendo el contexto",
     "Base estable mantenida"
   ],
   "pending": []
