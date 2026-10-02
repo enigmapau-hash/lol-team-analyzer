@@ -77,7 +77,8 @@
           .map((item) => {
             const status = item.missing || item.unknown || !item.champion || item.champion === "—" ? "is-issue" : "is-ok";
             const champion = item.champion || "—";
-            const detail = item.functionLabel || item.tempo || item.identity || (ready ? "Listo" : "Pendiente");
+            const identity = item.identity || (ready ? "Listo" : "Pendiente");
+            const functionLabel = item.functionLabel || (ready ? "Listo" : "Pendiente");
             const icon = item.icon || `<span class="result-summary__icon placeholder" aria-hidden="true">${champion.slice(0, 2).toUpperCase()}</span>`;
 
             return `
@@ -86,7 +87,10 @@
                 <div class="result-summary__role-copy">
                   <span class="result-summary__role-label">${item.role || "Rol"}</span>
                   <strong>${champion}</strong>
-                  <small>${detail}</small>
+                  <div class="result-summary__role-meta">
+                    <small><span class="result-summary__role-k">Identidad</span>${identity}</small>
+                    <small><span class="result-summary__role-k">Función</span>${functionLabel}</small>
+                  </div>
                 </div>
               </article>
             `;
