@@ -1,13 +1,13 @@
 {
-  "version": "v1.1.5",
-  "track": "Auditoría UX",
+  "version": "v1.1.6",
+  "track": "Pulido visual",
   "label": "Preview",
   "updated": "2026-10-02",
   "summary": [
-    "Sinergia global plegable por defecto",
-    "Menos ruido visual en el resultado",
-    "Lectura rápida más clara",
-    "Detalles manteniendo el contexto",
+    "Márgenes y alineaciones refinados",
+    "Iconos y tarjetas más compactos",
+    "Responsive móvil y tablet pulido",
+    "Colores más consistentes",
     "Base estable mantenida"
   ],
   "pending": []
