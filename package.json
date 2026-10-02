@@ -7,9 +7,11 @@
   "scripts": {
     "audit:excel": "node tools/check-workbook.cjs \"Draft Pool.xlsx\"",
     "audit:excel:report": "node tools/check-workbook.cjs \"Draft Pool.xlsx\" > workbook-report.json",
-    "audit:composition": "node tools/audit-composition.cjs \"Draft Pool.xlsx\" tests/cases.json",
+    "generate:composition-cases": "node tools/generate-composition-cases.cjs \"Draft Pool.xlsx\" tests/composition.validation.json 30",
+    "validate:composition-cases": "node tools/validate-composition-cases.cjs \"Draft Pool.xlsx\" tests/composition.validation.json",
+    "audit:composition": "npm run generate:composition-cases && npm run validate:composition-cases",
     "audit:public-assets": "node tools/check-public-assets.cjs",
-    "audit:all": "node tools/run-audit-suite.cjs \"Draft Pool.xlsx\" tests/cases.json && node tools/check-public-assets.cjs",
+    "audit:all": "npm run audit:composition && node tools/check-public-assets.cjs",
     "extract:workbook": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\" draft-pool.json",
     "extract:workbook:stdout": "node tools/extract-workbook.cjs \"Draft Pool.xlsx\"",
     "validate:cases": "node tools/validate-cases.cjs",
