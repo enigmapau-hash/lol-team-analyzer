@@ -1,13 +1,13 @@
 {
-  "version": "v1.1.0",
-  "track": "Evolución de UX",
+  "version": "v1.1.1",
+  "track": "Búsqueda inteligente",
   "label": "Preview",
   "updated": "2026-10-02",
   "summary": [
-    "Selector compacto con iconos",
-    "Campeones duplicados ocultos",
-    "Análisis en tiempo real",
-    "Despliegue y caché corregidos",
+    "Búsqueda por parte del nombre",
+    "Acrónimos como MF o KOG",
+    "Coincidencias mejor ordenadas",
+    "Selector sin duplicados",
     "Base estable mantenida"
   ],
   "pending": []
