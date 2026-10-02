@@ -1,13 +1,12 @@
 {
-  "version": "v1.1.7",
-  "track": "Refactor ligero",
+  "version": "v1.1.8",
+  "track": "Selector corregido",
   "label": "Preview",
   "updated": "2026-10-02",
   "summary": [
-    "CSS consolidado y simplificado",
-    "Helpers compartidos para texto",
-    "Assets obsoletos eliminados",
-    "Nombres y carga más consistentes",
+    "Clic en opciones del selector restaurado",
+    "data-role presente en cada opción",
+    "Búsqueda inteligente mantenida",
     "Base estable mantenida"
   ],
   "pending": []
