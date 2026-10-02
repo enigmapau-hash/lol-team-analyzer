@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Captura de referencia con el selector desplegado">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#090b10"/>
+      <stop offset="100%" stop-color="#0d0f14"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <style>
+      .title{font:700 38px Inter,Segoe UI,Arial,sans-serif; fill:#fff}
+      .sub{font:400 18px Inter,Segoe UI,Arial,sans-serif; fill:#a4adbc}
+      .label{font:700 16px Inter,Segoe UI,Arial,sans-serif; fill:#b9c2d0; letter-spacing:.1em; text-transform:uppercase}
+      .txt{font:600 18px Inter,Segoe UI,Arial,sans-serif; fill:#edf2f7}
+      .small{font:500 12px Inter,Segoe UI,Arial,sans-serif; fill:#d6dce5}
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="850" cy="0" rx="520" ry="230" fill="rgba(226,41,47,0.18)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="50" width="1460" height="76" rx="20" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
+    <text x="100" y="86" class="label">Rift Architect</text>
+    <text x="100" y="116" class="title" style="font-size:28px">Selector inteligente</text>
+    <rect x="1380" y="66" width="130" height="44" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+    <text x="1408" y="93" class="sub" style="font-size:16px">Listo</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="146" width="1460" height="262" rx="28" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.12)"/>
+    <text x="102" y="192" class="label">Composición</text>
+
+    <g>
+      <rect x="102" y="214" width="248" height="100" rx="18" fill="#0f131a" stroke="rgba(255,255,255,0.08)"/>
+      <text x="122" y="242" class="sub">Top</text>
+      <rect x="122" y="256" width="208" height="42" rx="12" fill="#11161f" stroke="rgba(255,255,255,0.08)"/>
+      <text x="144" y="283" class="txt" style="font-size:16px">Cho'Gath</text>
+      <circle cx="154" cy="278" r="10" fill="#2b313f"/>
+    </g>
+    <g>
+      <rect x="372" y="214" width="248" height="100" rx="18" fill="#0f131a" stroke="rgba(255,255,255,0.08)"/>
+      <text x="392" y="242" class="sub">Jungla</text>
+      <rect x="392" y="256" width="208" height="42" rx="12" fill="#11161f" stroke="rgba(255,255,255,0.08)"/>
+      <text x="414" y="283" class="txt" style="font-size:16px">Vi</text>
+      <circle cx="424" cy="278" r="10" fill="#2b313f"/>
+    </g>
+    <g>
+      <rect x="642" y="214" width="248" height="100" rx="18" fill="#0f131a" stroke="rgba(255,255,255,0.08)"/>
+      <text x="662" y="242" class="sub">Mid</text>
+      <rect x="662" y="256" width="208" height="42" rx="12" fill="#11161f" stroke="rgba(255,255,255,0.08)"/>
+      <text x="684" y="283" class="txt" style="font-size:16px">Ahri</text>
+      <circle cx="694" cy="278" r="10" fill="#2b313f"/>
+    </g>
+
+    <g>
+      <rect x="912" y="214" width="248" height="100" rx="18" fill="#0f131a" stroke="rgba(255,255,255,0.08)"/>
+      <text x="932" y="242" class="sub">Botline</text>
+      <rect x="932" y="256" width="208" height="42" rx="12" fill="#11161f" stroke="rgba(255,255,255,0.08)"/>
+      <text x="954" y="283" class="txt" style="font-size:16px">Jinx</text>
+      <circle cx="964" cy="278" r="10" fill="#2b313f"/>
+    </g>
+
+    <g>
+      <rect x="1182" y="214" width="248" height="100" rx="18" fill="#0f131a" stroke="rgba(255,255,255,0.08)"/>
+      <text x="1202" y="242" class="sub">Support</text>
+      <rect x="1202" y="256" width="208" height="42" rx="12" fill="#11161f" stroke="rgba(255,255,255,0.08)"/>
+      <text x="1224" y="283" class="txt" style="font-size:16px">Leona</text>
+      <circle cx="1234" cy="278" r="10" fill="#2b313f"/>
+    </g>
+
+    <rect x="102" y="326" width="178" height="40" rx="12" fill="#e2292f"/>
+    <text x="140" y="352" class="txt" style="font-size:16px; fill:#fff">Analizar</text>
+    <rect x="290" y="326" width="204" height="40" rx="12" fill="rgba(255,255,255,0.07)"/>
+    <text x="324" y="352" class="txt" style="font-size:16px; fill:#edf2f7">Limpiar selección</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="432" width="1460" height="414" rx="28" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.12)"/>
+    <text x="102" y="478" class="label">Selector</text>
+    <text x="102" y="506" class="sub">Aparece filtrado y con iconos en cada opción.</text>
+
+    <rect x="102" y="532" width="390" height="54" rx="14" fill="#11161f" stroke="rgba(226,41,47,0.6)"/>
+    <circle cx="132" cy="559" r="11" fill="#2b313f"/>
+    <text x="156" y="566" class="txt" style="font-size:16px">Cho'Gath</text>
+    <text x="332" y="566" class="small">▼</text>
+
+    <rect x="102" y="588" width="390" height="248" rx="18" fill="#10141b" stroke="rgba(255,255,255,0.12)"/>
+    <g>
+      <rect x="114" y="600" width="366" height="40" rx="12" fill="rgba(226,41,47,0.18)"/>
+      <circle cx="136" cy="620" r="10" fill="#2b313f"/>
+      <text x="156" y="626" class="txt" style="font-size:15px">Cho'Gath</text>
+    </g>
+    <g>
+      <rect x="114" y="646" width="366" height="40" rx="12" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="136" cy="666" r="10" fill="#2b313f"/>
+      <text x="156" y="672" class="txt" style="font-size:15px">Chogath</text>
+    </g>
+    <g>
+      <rect x="114" y="692" width="366" height="40" rx="12" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="136" cy="712" r="10" fill="#2b313f"/>
+      <text x="156" y="718" class="txt" style="font-size:15px">Cho'Gath Supp</text>
+    </g>
+    <g>
+      <rect x="114" y="738" width="366" height="40" rx="12" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="136" cy="758" r="10" fill="#2b313f"/>
+      <text x="156" y="764" class="txt" style="font-size:15px">Cho'Gath Jungle</text>
+    </g>
+
+    <rect x="520" y="532" width="980" height="248" rx="18" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="550" y="572" class="label" style="font-size:14px">Vista rápida</text>
+    <text x="550" y="606" class="sub" style="font-size:16px">La selección se aplica al hacer clic o escribir.</text>
+    <rect x="550" y="636" width="170" height="42" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="574" y="663" class="small">Identidad · Tanque</text>
+    <rect x="730" y="636" width="170" height="42" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="760" y="663" class="small">Función · Frontline</text>
+    <rect x="910" y="636" width="170" height="42" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="946" y="663" class="small">Ritmo · Medio</text>
+    <rect x="550" y="700" width="420" height="64" rx="16" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="570" y="730" class="txt" style="font-size:16px">Fortalezas destacadas</text>
+    <text x="570" y="752" class="small">Engage · Frontline · Escalado</text>
+  </g>
+
+  <rect x="1410" y="842" width="116" height="32" rx="12" fill="rgba(17,19,24,0.92)" stroke="rgba(255,255,255,0.12)"/>
+  <text x="1430" y="863" class="small">v1.2.0</text>
+</svg>
