@@ -4,14 +4,14 @@
   if (!badge || !panel) return;
 
   const fallback = {
-    version: "v1.1.2",
-    track: "Resultados visuales",
+    version: "v1.1.3",
+    track: "Vista rápida ampliada",
     label: "Preview",
     updated: "2026-10-02",
     summary: [
-      "Resumen rápido encima de la tabla",
-      "Composición más legible de un vistazo",
-      "Detalle tabulado mantenido",
+      "Identidad en la vista rápida",
+      "Función en la vista rápida",
+      "Resumen compacto sobre la tabla",
       "Selector y búsqueda consolidados",
       "Base estable mantenida",
     ],
