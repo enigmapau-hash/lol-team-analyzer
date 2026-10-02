@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.6
+
+### Added
+- Márgenes y alineaciones refinados.
+- Iconos y tarjetas más compactos.
+- Responsive móvil y tablet pulido.
+- Colores más consistentes.
+
+### Notes
+- El pulido visual mejora la lectura sin tocar la lógica.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.5
 
 ### Added
