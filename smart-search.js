@@ -68,9 +68,10 @@
                 class="picker-item${index === 0 ? " is-active" : ""}"
                 role="option"
                 aria-selected="${index === 0 ? "true" : "false"}"
-                data-champion="${item.name}"
+                data-role="${escapeHtml(roleKey)}"
+                data-champion="${escapeHtml(item.name)}"
               >
-                <span class="picker-name">${item.name}</span>
+                <span class="picker-name">${escapeHtml(item.name)}</span>
               </button>
             `;
           })
