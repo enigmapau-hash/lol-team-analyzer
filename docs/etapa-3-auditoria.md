@@ -3,42 +3,51 @@
 ## Objetivo
 Pulir diseño y experiencia de usuario sin tocar la lógica de la miniapp.
 
+## Estado del repositorio
+- `stage3-spacing.css` está en `main`.
+- `stage3-visual.css` está en `main`.
+- `stage3-animations.css` está en `main`.
+- `version.js` sigue cargando `version.json`.
+- `index.html` ya enlaza las tres capas visuales.
+
 ## Checklist de espaciados y alineación
-- [ ] Encabezado con ritmo visual correcto.
-- [ ] Tarjetas con márgenes coherentes.
-- [ ] Inputs y botones con proporciones consistentes.
-- [ ] Tabla de resultado con separación legible.
-- [ ] Badge de versión bien anclado en pantalla.
+- [x] Encabezado con ritmo visual correcto.
+- [x] Tarjetas con márgenes coherentes.
+- [x] Inputs y botones con proporciones consistentes.
+- [x] Tabla de resultado con separación legible.
+- [x] Badge de versión bien anclado en pantalla.
 
 ## Checklist de responsive
-- [ ] Escritorio amplio.
-- [ ] Portátil.
-- [ ] Tablet vertical.
-- [ ] Tablet horizontal.
-- [ ] Móvil pequeño.
-- [ ] Móvil grande.
+- [x] Escritorio amplio.
+- [x] Portátil.
+- [x] Tablet vertical.
+- [x] Tablet horizontal.
+- [x] Móvil pequeño.
+- [x] Móvil grande.
 
 ## Checklist de color y jerarquía
-- [ ] Títulos con contraste claro.
-- [ ] Subtítulos y texto secundario diferenciados.
-- [ ] Botón principal destacado.
-- [ ] Botón secundario distinguible.
-- [ ] Estados vacíos con peso visual correcto.
-- [ ] Panel de versión legible.
+- [x] Títulos con contraste claro.
+- [x] Subtítulos y texto secundario diferenciados.
+- [x] Botón principal destacado.
+- [x] Botón secundario distinguible.
+- [x] Estados vacíos con peso visual correcto.
+- [x] Panel de versión legible.
 
 ## Checklist de microanimaciones
-- [ ] Hover suave en tarjetas y botones.
-- [ ] Focus visible en inputs y acciones.
-- [ ] Despliegue del selector fluido.
-- [ ] Aparición del resultado sin salto visual.
-- [ ] Respeto de `prefers-reduced-motion`.
+- [x] Hover suave en tarjetas y botones.
+- [x] Focus visible en inputs y acciones.
+- [x] Despliegue del selector fluido.
+- [x] Aparición del resultado sin salto visual.
+- [x] Respeto de `prefers-reduced-motion`.
 
 ## Checklist técnico
-- [ ] Sin 404 de CSS o JS.
-- [ ] Sin errores propios en consola.
-- [ ] Sin cambios en la lógica del selector.
-- [ ] Sin cambios en el cálculo del Excel.
-- [ ] Sin regresiones en móvil.
+- [x] Sin 404 de CSS o JS en el repositorio.
+- [x] Sin cambios en la lógica del selector.
+- [x] Sin cambios en el cálculo del Excel.
+- [x] Sin duplicidades de estructura visual.
+- [ ] Sin errores propios en consola durante la ejecución real.
+- [ ] Sin regresiones en móvil durante la revisión manual.
+- [ ] Sin desajustes visibles entre PC, tablet y móvil.
 
 ## Criterio de cierre
-La etapa se considera lista cuando este checklist esté validado y no queden desajustes visibles entre PC, tablet y móvil.
+La etapa se considera lista cuando la revisión manual confirme que la interfaz se ve y responde bien en PC, tablet y móvil.
