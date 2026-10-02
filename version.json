@@ -1,13 +1,13 @@
 {
-  "version": "v1.1.6",
-  "track": "Pulido visual",
+  "version": "v1.1.7",
+  "track": "Refactor ligero",
   "label": "Preview",
   "updated": "2026-10-02",
   "summary": [
-    "Márgenes y alineaciones refinados",
-    "Iconos y tarjetas más compactos",
-    "Responsive móvil y tablet pulido",
-    "Colores más consistentes",
+    "CSS consolidado y simplificado",
+    "Helpers compartidos para texto",
+    "Assets obsoletos eliminados",
+    "Nombres y carga más consistentes",
     "Base estable mantenida"
   ],
   "pending": []
