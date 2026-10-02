@@ -1,5 +1,5 @@
 (() => {
-  const normalizeText = window.normalizeText;
+  const normalizeText = window.LTAUtils?.normalizeText;
   if (typeof normalizeText !== "function") return;
 
   const roles = [
