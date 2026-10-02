@@ -32,7 +32,7 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site
-          cp index.html style.css app.js manifest.json sw.js icon.svg _site/
+          cp index.html manifest.json icon.svg version.json "Draft Pool.xlsx" *.css *.js _site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
