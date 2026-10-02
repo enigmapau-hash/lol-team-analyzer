@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.7
+
+### Added
+- CSS consolidado en menos archivos.
+- Helpers compartidos para normalización y escape de texto.
+- Assets obsoletos eliminados del despliegue.
+- Carga de scripts y caché más consistente.
+
+### Notes
+- Refactor interno sin cambio funcional.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.6
 
 ### Added
