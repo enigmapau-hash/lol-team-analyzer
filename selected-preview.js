@@ -1,10 +1,10 @@
 (() => {
-  const ROLES = [
-    { key: "top", label: "Top", inputId: "top" },
-    { key: "jungle", label: "Jungla", inputId: "jungle" },
-    { key: "mid", label: "Mid", inputId: "mid" },
-    { key: "botline", label: "Botline", inputId: "adc" },
-    { key: "support", label: "Support", inputId: "support" },
+  const roles = [
+    { key: "top", inputId: "top" },
+    { key: "jungle", inputId: "jungle" },
+    { key: "mid", inputId: "mid" },
+    { key: "botline", inputId: "adc" },
+    { key: "support", inputId: "support" },
   ];
 
   const DDragonVersionsURL = "https://ddragon.leagueoflegends.com/api/versions.json";
@@ -24,88 +24,28 @@
       .trim()
       .toLowerCase();
 
-  const escapeHtml = (value) =>
-    String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
+  const getInput = (role) => document.getElementById(role.inputId);
 
-  function getInput(role) {
-    return document.getElementById(role.inputId);
-  }
-
-  function getPreview(role) {
-    return document.querySelector(`[data-selected-preview="${role.key}"]`);
-  }
-
-  function buildPreview(role) {
+  function renderRole(role) {
     const input = getInput(role);
-    const shell = input?.closest(".picker-shell");
-    if (!shell) return null;
-
-    const existing = getPreview(role);
-    if (existing) return existing;
-
-    const preview = document.createElement("div");
-    preview.className = "selected-champion is-empty";
-    preview.dataset.selectedPreview = role.key;
-    preview.setAttribute("aria-live", "polite");
-    preview.innerHTML = `
-      <span class="selected-champion__icon placeholder" aria-hidden="true">—</span>
-      <span class="selected-champion__text">Sin campeón</span>
-    `;
-
-    shell.insertAdjacentElement("afterend", preview);
-    return preview;
-  }
-
-  function ensurePreviews() {
-    for (const role of ROLES) {
-      buildPreview(role);
-    }
-  }
-
-  function renderPreview(role) {
-    const input = getInput(role);
-    const preview = getPreview(role) || buildPreview(role);
-    if (!input || !preview) return;
+    if (!input) return;
 
     const rawValue = input.value.trim();
     const meta = championMeta.get(normalize(rawValue)) || null;
-    const displayName = meta?.name || rawValue;
 
-    preview.classList.toggle("is-empty", !rawValue);
-    preview.setAttribute(
-      "aria-label",
-      rawValue ? `${role.label}: ${displayName}` : `${role.label}: Sin campeón`
-    );
-
-    if (!rawValue) {
-      preview.innerHTML = `
-        <span class="selected-champion__icon placeholder" aria-hidden="true">—</span>
-        <span class="selected-champion__text">Sin campeón</span>
-      `;
+    if (!rawValue || !meta?.iconUrl) {
+      input.classList.remove("has-selected-champion");
+      input.style.removeProperty("--selected-champion-icon");
       return;
     }
 
-    const iconMarkup = meta
-      ? `<img class="selected-champion__icon" src="${escapeHtml(meta.iconUrl)}" alt="" loading="lazy" />`
-      : `<span class="selected-champion__icon placeholder" aria-hidden="true">${escapeHtml(
-          displayName.slice(0, 2).toUpperCase() || "?"
-        )}</span>`;
-
-    preview.innerHTML = `
-      ${iconMarkup}
-      <span class="selected-champion__text">${escapeHtml(displayName || rawValue)}</span>
-    `;
+    input.classList.add("has-selected-champion");
+    input.style.setProperty("--selected-champion-icon", `url("${meta.iconUrl}")`);
   }
 
-  function renderAllPreviews() {
-    ensurePreviews();
-    for (const role of ROLES) {
-      renderPreview(role);
+  function renderAll() {
+    for (const role of roles) {
+      renderRole(role);
     }
   }
 
@@ -114,7 +54,7 @@
     refreshQueued = true;
     window.requestAnimationFrame(() => {
       refreshQueued = false;
-      renderAllPreviews();
+      renderAll();
     });
   }
 
@@ -145,12 +85,12 @@
     } catch {
       championMeta.clear();
     } finally {
-      renderAllPreviews();
+      renderAll();
     }
   }
 
   function bindInputs() {
-    for (const role of ROLES) {
+    for (const role of roles) {
       const input = getInput(role);
       if (!input) continue;
       input.addEventListener("input", scheduleRender);
@@ -158,34 +98,30 @@
       input.addEventListener("blur", scheduleRender);
     }
 
-    document.addEventListener("pointerdown", (event) => {
+    document.addEventListener(
+      "pointerdown",
+      (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (target.closest(".picker-item")) {
+          window.requestAnimationFrame(scheduleRender);
+        }
+      },
+      true
+    );
+
+    document.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
-      if (target.closest(".picker-item") || target.closest("#demoBtn")) {
-        window.requestAnimationFrame(renderAllPreviews);
+      if (target.closest("#demoBtn") || target.closest(".picker-item")) {
+        window.requestAnimationFrame(scheduleRender);
       }
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === "Escape") {
-        window.requestAnimationFrame(renderAllPreviews);
-      }
-    });
-  }
-
-  function observeDemoButton() {
-    const demoBtn = document.getElementById("demoBtn");
-    if (!demoBtn) return;
-    demoBtn.addEventListener("click", () => {
-      window.requestAnimationFrame(renderAllPreviews);
     });
   }
 
   function init() {
-    ensurePreviews();
     bindInputs();
-    observeDemoButton();
-    renderAllPreviews();
+    renderAll();
     loadMeta();
   }
 
