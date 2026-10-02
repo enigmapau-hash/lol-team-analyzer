@@ -5,7 +5,7 @@
   "description": "Mini app de League of Legends basada en la pestaña Composición del Excel.",
   "type": "commonjs",
   "scripts": {
-    "audit:excel": "node tools/check-workbook.cjs \"Draft Pool.xlsx\"",
+    "audit:excel": "node tools/check-workbook.cjs \"Draft Pool.xlsx\" > workbook-report.json",
     "audit:excel:report": "node tools/check-workbook.cjs \"Draft Pool.xlsx\" > workbook-report.json",
     "generate:composition-cases": "node tools/generate-composition-cases.cjs \"Draft Pool.xlsx\" tests/composition.validation.json 30",
     "validate:composition-cases": "node tools/validate-composition-cases.cjs \"Draft Pool.xlsx\" tests/composition.validation.json composition-validation-report.json",
