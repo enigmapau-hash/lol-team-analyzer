@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.2.0
+
+### Added
+- README ampliado con flujo, estructura y uso.
+- Capturas de referencia añadidas al repositorio.
+- Arquitectura actualizada para reflejar la base actual.
+
+### Notes
+- La base funcional se mantiene intacta.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.8
 
 ### Fixed
