@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.2
+
+### Added
+- Resumen visual compacto encima de la tabla de resultado.
+- Vista rápida con estado general y chips por rol.
+- Mantiene el detalle tabulado sin cambiar la lógica del Excel.
+
+### Notes
+- La presentación del resultado es más clara y ocupa menos atención visual.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.1
 
 ### Added
