@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.8
+
+### Fixed
+- Restaurado el clic sobre las opciones del selector tras el refactor.
+- Añadido `data-role` a cada opción para aplicar correctamente el campeón.
+
+### Notes
+- El selector vuelve a funcionar tanto al escribir como al elegir con clic.
+- La versión visible avanza con cada entrega publicada.
+
 ## v1.1.7
 
 ### Added
