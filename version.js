@@ -4,15 +4,15 @@
   if (!badge || !panel) return;
 
   const fallback = {
-    version: "v1.1.3",
-    track: "Vista rápida ampliada",
+    version: "v1.1.4",
+    track: "Sinergia global",
     label: "Preview",
     updated: "2026-10-02",
     summary: [
-      "Identidad en la vista rápida",
-      "Función en la vista rápida",
-      "Resumen compacto sobre la tabla",
-      "Selector y búsqueda consolidados",
+      "Sinergia global encima del resultado",
+      "Identidades resumidas por frecuencia",
+      "Funciones resumidas por frecuencia",
+      "Fortalezas y debilidades destacadas",
       "Base estable mantenida",
     ],
     pending: [],
