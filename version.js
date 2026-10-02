@@ -4,15 +4,15 @@
   if (!badge || !panel) return;
 
   const fallback = {
-    version: "v1.1.1",
-    track: "Búsqueda inteligente",
+    version: "v1.1.2",
+    track: "Resultados visuales",
     label: "Preview",
     updated: "2026-10-02",
     summary: [
-      "Búsqueda por parte del nombre",
-      "Acrónimos como MF o KOG",
-      "Coincidencias mejor ordenadas",
-      "Selector sin duplicados",
+      "Resumen rápido encima de la tabla",
+      "Composición más legible de un vistazo",
+      "Detalle tabulado mantenido",
+      "Selector y búsqueda consolidados",
       "Base estable mantenida",
     ],
     pending: [],
