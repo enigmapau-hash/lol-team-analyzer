@@ -26,11 +26,20 @@ Mini PWA para reproducir la pestaña **Composición** del Excel del repositorio 
 - Si el Excel no se puede leer, la app muestra un aviso claro.
 - La base queda cerrada en `v1.0.0`.
 
+## Validación contra el Excel
+
+La validación exacta ya está montada para comprobar casos generados desde el propio workbook:
+
+- `npm run generate:composition-cases` → genera 30 casos exactos desde `Draft Pool.xlsx`
+- `npm run validate:composition-cases` → compara esos casos contra el Excel
+- `npm run audit:composition` → genera y valida en un solo paso
+- `npm run audit:all` → ejecuta la validación exacta y luego revisa los assets públicos
+
 ## Comandos útiles
 
 - `npm run audit:excel` → valida la estructura del Excel sin convertirlo a JSON
-- `npm run audit:composition` → compara la hoja **Composición** con `tests/cases.json` directamente desde el Excel
-- `npm run audit:all` → ejecuta ambas auditorías y genera un único informe consolidado
+- `npm run audit:composition` → genera 30 casos exactos desde el Excel y los valida
+- `npm run audit:all` → ejecuta la validación exacta y la revisión de assets públicos
 - `npm run version:sync` → sincroniza versión, changelog y metadata visible
 
 ## CI / GitHub Actions
